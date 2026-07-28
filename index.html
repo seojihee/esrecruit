@@ -66,31 +66,30 @@
     .char-cnt { font-size: 11px; color: #94a3b8; text-align: right; margin-top: 3px; }
     .char-cnt.over { color: #ef4444; }
 
-    /* ── Color swatch ── */
-    .color-swatch {
-      width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
-      border: 3px solid transparent; transition: transform .15s, box-shadow .15s;
-      flex-shrink: 0;
-    }
-    .color-swatch:hover { transform: scale(1.15); }
-    .color-swatch.on { border-color: white; box-shadow: 0 0 0 3px #2563eb; }
-
-    /* ── Pattern buttons ── */
-    .pat-btn {
-      width: 68px; height: 48px; border-radius: 8px; cursor: pointer;
-      border: 2.5px solid transparent; overflow: hidden; transition: border-color .15s, box-shadow .15s;
-    }
-    .pat-btn.on { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.25); }
-
     /* ── Tip box ── */
     .tip-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 16px; }
 
-    /* ── Proc tag ── */
-    .proc-tag {
-      display: inline-flex; align-items: center; gap: 3px;
-      background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
-      border-radius: 6px; padding: 3px 9px; font-size: 12px; font-weight: 500;
+    /* ── Proc track editor (Step 2) ── */
+    .proc-track-card {
+      border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; background: #fafbfc;
     }
+    .proc-track-card + .proc-track-card { margin-top: 12px; }
+    .proc-step-row {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .proc-step-row:last-child { border-bottom: none; }
+    .proc-step-row .f-input { flex: 1; min-width: 0; }
+    .proc-icon-btn {
+      width: 28px; height: 28px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid #e5e7eb; border-radius: 6px; background: #fff;
+      color: #64748b; font-size: 11px; cursor: pointer; line-height: 1;
+    }
+    .proc-icon-btn:hover:not(:disabled) { background: #f8fafc; color: #1e293b; }
+    .proc-icon-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .proc-icon-btn.is-danger { color: #94a3b8; }
+    .proc-icon-btn.is-danger:hover:not(:disabled) { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
 
     /* ── Dept row ── */
     .dept-form-row {
@@ -214,6 +213,20 @@
     .pv-apply-title { margin: 0; font-size: 38px; font-weight: 700; line-height: 1.5; color: #1e3a47; }
     .pv-apply-url { margin: 0; font-size: 30px; font-weight: 600; line-height: 1.8; color: #1e3a47; }
     .pv-apply-flow { margin: 0; font-size: 28px; font-weight: 500; line-height: 1.5; color: #1e3a47; }
+    .pv-proc-tracks { display: flex; flex-direction: column; gap: 36px; }
+    .pv-proc-track { display: flex; flex-direction: column; gap: 18px; }
+    .pv-proc-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .pv-proc-title {
+      margin: 0; font-size: 28px; font-weight: 700; line-height: 1.4; color: #1e3a47;
+    }
+    .pv-proc-chip {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 28px; padding: 0 10px; border-radius: 7px;
+      font-size: 16px; font-weight: 500; line-height: 1.4;
+    }
+    .pv-proc-chip.is-regular { background: rgba(0,177,204,.15); color: #00b1cc; }
+    .pv-proc-chip.is-contract { background: rgba(98,196,0,.15); color: #5fb10d; }
+    .pv-proc-chip.is-intern { background: rgba(204,119,0,.15); color: #c80; }
     .pv-proc-list { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
     .pv-proc-item {
       display: flex; align-items: center; justify-content: center;
@@ -515,38 +528,15 @@
         <select id="sel-corp" class="f-input text-sm" style="padding:7px 10px;"
           onchange="onCorpChange(this.value)">
           <option value="es">대학내일ES</option>
-          <option value="daehak">대학내일</option>
-          <option value="campus">캠퍼스픽</option>
-          <option value="school">내일학교</option>
-          <option value="economy">경제연구소</option>
-          <option value="research">20대연구소</option>
-          <option value="editors">에디터스</option>
+          <option value="percent51">51percent</option>
+          <option value="positive">the positive</option>
+          <option value="webetter">WE+BETTER</option>
+          <option value="conceptual">컨셉추얼</option>
         </select>
       </div>
 
-      <!-- Accent Color -->
-      <div>
-        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">강조 컬러</label>
-        <div class="flex flex-wrap gap-2 items-center" id="swatches">
-          <button class="color-swatch" data-c="#00b1cc" style="background:#00b1cc" onclick="onColorPick('#00b1cc',this)" title="하늘색"></button>
-          <button class="color-swatch" data-c="#29c4e0" style="background:#29c4e0" onclick="onColorPick('#29c4e0',this)" title="시안"></button>
-          <button class="color-swatch" data-c="#2563eb" style="background:#2563eb" onclick="onColorPick('#2563eb',this)" title="파란색"></button>
-          <button class="color-swatch" data-c="#06b6d4" style="background:#06b6d4" onclick="onColorPick('#06b6d4',this)" title="청록색"></button>
-          <button class="color-swatch" data-c="#f97316" style="background:#f97316" onclick="onColorPick('#f97316',this)" title="주황색"></button>
-          <button class="color-swatch" data-c="#8b5cf6" style="background:#8b5cf6" onclick="onColorPick('#8b5cf6',this)" title="보라색"></button>
-          <button class="color-swatch" data-c="#10b981" style="background:#10b981" onclick="onColorPick('#10b981',this)" title="초록색"></button>
-          <button class="color-swatch" data-c="#ef4444" style="background:#ef4444" onclick="onColorPick('#ef4444',this)" title="빨간색"></button>
-          <label class="color-swatch flex items-center justify-center relative cursor-pointer"
-            style="background:#f1f5f9;border:2px dashed #cbd5e1;font-size:14px;color:#94a3b8;" title="커스텀 컬러">
-            +
-            <input type="color" class="absolute opacity-0 inset-0 w-full h-full cursor-pointer"
-              onchange="onColorPick(this.value, null)">
-          </label>
-        </div>
-      </div>
-
       <div class="border-t border-gray-100 pt-4">
-        <p class="text-xs text-gray-400 leading-relaxed">법인별 배경 이미지는<br/>추후 업데이트 예정입니다.</p>
+        <p class="text-xs text-gray-400 leading-relaxed">법인 선택 시 메인 비주얼<br/>배경 이미지가 변경됩니다.</p>
       </div>
     </div>
   </aside>
@@ -587,7 +577,7 @@
 // ─────────────────────────────────────────────────────────────
 // EMBEDDED IMAGES
 // ─────────────────────────────────────────────────────────────
-const BG_DATA_URI   = 'assets/bg-basic.png';
+const BG_DEFAULT    = 'assets/bg/bg-es.png';
 const CI_DNES_URI  = 'assets/ci-dnes.svg';
 
 const CI_DNES_SVG = `<svg class="pv-corp-logo" id="preview-corp-logo" viewBox="0 0 184 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="대학내일ES"><path d="M145.582 31.6836C146.765 29.2997 145.795 26.4062 143.415 25.2208C141.035 24.0353 138.146 25.0069 136.963 27.3908C135.779 29.7746 136.749 32.6681 139.129 33.8536C141.509 35.039 144.398 34.0675 145.582 31.6836Z" fill="white"/><path d="M165.654 29.1223H148.383V34.3399H165.654V29.1223Z" fill="white"/><path d="M143.91 19.1125H157.019V13.8098H143.91V5.30277H157.019V0.0851486H138.587V22.4585H143.91V19.1125Z" fill="white"/><path d="M169.164 19.4527C169.164 19.4527 175.818 20.8422 177.29 22.0615C178.281 22.8838 179.215 24.5569 178.168 26.6836C177.29 28.4701 174.544 29.1223 172.364 29.1223H167.975V34.3399H170.523C175.082 34.3399 184 33.4041 184 24.5002C184 18.0348 178.564 16.3618 175.336 15.5395C174.147 15.2559 166.475 13.9231 166.475 9.41443C166.475 6.72055 169.193 5.55792 169.957 5.30271C175.959 3.51625 178.592 8.02495 178.904 10.0099L183.604 8.42195C183.49 7.20261 181.593 0.0567361 172.052 2.28131e-05C170.269 2.28131e-05 161.464 1.07758 161.011 9.98156C160.841 12.9023 162.313 17.6379 169.164 19.4527Z" fill="white"/><path d="M12.8537 6.10352e-05H0V5.30275H12.8537V6.10352e-05Z" fill="white"/><path d="M12.8537 34.34V29.094H6.56847C5.86066 29.0656 5.29442 28.4985 5.29442 27.8179V7.88322H0.0283733V29.8029C0.141622 32.355 2.26503 34.3683 4.84143 34.3683L12.8537 34.34Z" fill="white"/><path d="M82.841 34.3399V29.0939H76.5841C75.8762 29.0656 75.31 28.4984 75.31 27.8179V2.28131e-05H70.0156V29.7745C70.1289 32.3266 72.2523 34.3399 74.8287 34.3399H82.841Z" fill="white"/><path d="M24.235 13.6963H20.7243V2.28131e-05H15.4016V34.3399H20.7243V18.999H24.235V34.3399H29.5576V2.28131e-05H24.235V13.6963Z" fill="white"/><path d="M94.2509 13.6963H90.6836V2.28131e-05H85.4175V34.3399H90.6836V18.999H94.2509V34.3399H99.5169V2.28131e-05H94.2509V13.6963Z" fill="white"/><path d="M112.257 17.3259C117.099 17.3259 121.034 13.4694 121.034 8.67716C121.034 3.88489 117.099 0.0283859 112.257 0.0283859C107.416 0.0283859 103.481 3.88489 103.481 8.67716C103.481 13.4694 107.416 17.3259 112.257 17.3259ZM112.286 5.16094C114.296 5.16094 115.91 6.74891 115.91 8.70552C115.91 10.6621 114.296 12.2501 112.286 12.2501C110.276 12.2501 108.662 10.6621 108.662 8.70552C108.718 6.74891 110.332 5.16094 112.286 5.16094Z" fill="white"/><path d="M105.066 18.9423V22.7988H126.442V24.6419H105.066V29.4626C105.066 32.1565 107.246 34.2832 109.879 34.2832H131.481V30.37H111.663C110.728 30.37 110.077 29.9446 110.077 29.2641V28.4701H131.509V18.8855V18.9706H105.066V18.9423Z" fill="white"/><path d="M131.481 2.28131e-05H126.13V16.4185H131.481V2.28131e-05Z" fill="white"/><path d="M63.5039 2.28131e-05H58.1246V21.2675H63.5039V13.6963H66.3068V7.82646H63.5039V2.28131e-05Z" fill="white"/><path d="M44.5632 22.2316C49.8575 22.2316 54.1327 17.9214 54.1327 12.6471C54.1327 10.9173 53.6513 9.301 52.8586 7.88317H55.4916V2.52376H47.4227V2.28131e-05H41.7036V2.49541H33.663V7.82646H36.296C35.475 9.24429 35.022 10.8606 35.022 12.5904C34.9654 17.9214 39.2688 22.2316 44.5632 22.2316ZM44.5632 8.33688C46.9414 8.33688 48.8666 10.2651 48.8666 12.6471C48.8666 15.029 46.9414 16.9573 44.5632 16.9573C42.1849 16.9573 40.2597 15.029 40.2597 12.6471C40.2597 10.2651 42.1849 8.33688 44.5632 8.33688Z" fill="white"/><path d="M34.9938 23.8196V29.0656H58.1248V34.3966H63.5041V23.848L63.4191 23.8196H34.9938Z" fill="white"/></svg>`;
@@ -598,23 +588,112 @@ const CI_DNES_SVG = `<svg class="pv-corp-logo" id="preview-corp-logo" viewBox="0
 const STORAGE_KEY = 'career_tool_v3';
 
 const CORP = {
-  es:       { name:'대학내일ES',      color:'#00b1cc', heading:'경계 없이 문제를 푸는\n최적의 파트너, 대학내일ES', intro:'대학내일ES는 마케팅, HR, 트렌드/인사이트, 미디어 영역에서\n사람, 브랜드, 조직의 성장을 도와\n비즈니스 임팩트를 만드는 종합 마케팅 에이전시입니다.' },
-  daehak:   { name:'대학내일',        color:'#2563eb', heading:'청년과 함께 성장하는\n대학내일', intro:'대학내일은 청년 세대를 위한 미디어와 마케팅 솔루션을\n제공하는 종합 청년 플랫폼 기업입니다.' },
-  campus:   { name:'캠퍼스픽',        color:'#10b981', heading:'대학생의 가능성을 연결하는\n캠퍼스픽', intro:'캠퍼스픽은 대학생을 위한 최대 정보 플랫폼으로\n대외활동·공모전·인턴 정보를 연결합니다.' },
-  school:   { name:'내일학교',        color:'#f97316', heading:'미래를 설계하는 교육,\n내일학교', intro:'내일학교는 미래 인재를 위한 혁신 교육 프로그램을\n운영하는 교육 전문 기관입니다.' },
-  economy:  { name:'대학내일경제연구소', color:'#8b5cf6', heading:'청년 경제를 분석하는\n대학내일경제연구소', intro:'대학내일경제연구소는 청년 경제·소비 트렌드를 연구하여\n기업과 정책 기관에 인사이트를 제공합니다.' },
-  research: { name:'대학내일20대연구소', color:'#06b6d4', heading:'20대를 가장 잘 아는\n대학내일20대연구소', intro:'대학내일20대연구소는 20대의 문화·가치관·라이프스타일을\n심층 연구하는 전문 연구소입니다.' },
-  editors:  { name:'에디터스',         color:'#ef4444', heading:'콘텐츠로 세상을 잇는\n에디터스', intro:'에디터스는 콘텐츠 기획·제작·유통을 전문으로 하는\n크리에이티브 에이전시입니다.' }
+  es: {
+    name: '대학내일ES',
+    color: '#00b1cc',
+    bg: 'assets/bg/bg-es.png',
+    logoInBg: true,
+    heading: '경계 없이 문제를 푸는\n최적의 파트너, 대학내일ES',
+    intro: '대학내일ES는 마케팅, HR, 트렌드/인사이트, 미디어 영역에서\n사람, 브랜드, 조직의 성장을 도와\n비즈니스 임팩트를 만드는 종합 마케팅 에이전시입니다.'
+  },
+  percent51: {
+    name: '51percent',
+    color: '#1a1a1a',
+    bg: 'assets/bg/bg-51percent.png',
+    logoInBg: true,
+    heading: '브랜딩과 세일즈를 선명하게 푸는\n51percent',
+    intro: '51percent는 브랜딩과 세일즈 아젠다를 가장 유효한 솔루션으로\n풀어내는 선명한 에이전시입니다.\n명확한 이해를 기반으로 최적의 솔루션 믹스를 제안합니다.'
+  },
+  positive: {
+    name: 'the positive',
+    color: '#2f6b4f',
+    bg: 'assets/bg/bg-thepositive.png',
+    logoInBg: true,
+    heading: '브랜드에 더 포지티브한\n솔루션을 제시합니다',
+    intro: '더포지티브는 브랜드/마케팅 커뮤니케이션 파트너입니다.\n차별적 감정 인사이트로 브랜드에 가장 포지티브한 길을 제시합니다.'
+  },
+  webetter: {
+    name: 'WE+BETTER',
+    color: '#4a5568',
+    bg: 'assets/bg/bg-webetter.png',
+    logoInBg: true,
+    heading: '최적의 미디어 솔루션을 제안하는\nWE+BETTER',
+    intro: '위베러는 미디어 솔루션 에이전시입니다.\n미디어 전문성과 틀을 깨는 유기적 시너지로 고객의 문제를 해결합니다.'
+  },
+  conceptual: {
+    name: '컨셉추얼',
+    color: '#2563eb',
+    bg: 'assets/bg/bg-conceptual.png',
+    logoInBg: true,
+    heading: '컨셉으로 문제를 정의하는\n컨셉추얼',
+    intro: '컨셉추얼은 브랜드와 캠페인의 핵심 컨셉을 설계하는\n크리에이티브 파트너입니다.'
+  }
 };
 
-const PATTERNS = [
-  { label:'패턴1', g:'linear-gradient(180deg,#c8f8ff 5%,#00b1cc 94%)' },
-  { label:'패턴2', g:'linear-gradient(135deg,#1e40af 0%,#2563eb 55%,#3b82f6 100%)' },
-  { label:'패턴3', g:'linear-gradient(135deg,#1e293b 0%,#334155 55%,#475569 100%)' },
-  { label:'패턴4', g:'linear-gradient(135deg,#312e81 0%,#4338ca 55%,#6366f1 100%)' }
-];
-
 const STEP_LABELS = ['메인 비주얼','모집요강','모집부문','최종 미리보기'];
+
+// 전형절차 고용 형태 (typeA–E)
+const PROC_TYPES = {
+  A: {
+    key: 'A',
+    menu: '정규직',
+    title: '신입/경력',
+    chip: '정규직',
+    chipClass: 'is-regular',
+    defaults: ['서류 접수', '면접 전형', '조직 적합성 면접', '최종 합격']
+  },
+  B: {
+    key: 'B',
+    menu: '계약직 (전환형)',
+    title: '계약직',
+    chip: '전환형',
+    chipClass: 'is-contract',
+    defaults: ['서류 접수', '면접 전형', '최종 합격', '근무 / 전환심사']
+  },
+  C: {
+    key: 'C',
+    menu: '인턴 (전환형)',
+    title: '인턴',
+    chip: '전환형',
+    chipClass: 'is-contract',
+    defaults: ['서류 접수', '면접 전형', '인턴 입사', '전환 심사']
+  },
+  D: {
+    key: 'D',
+    menu: '계약직',
+    title: '계약직',
+    chip: '계약직',
+    chipClass: 'is-contract',
+    defaults: ['서류 접수', '면접 전형', '최종 합격']
+  },
+  E: {
+    key: 'E',
+    menu: '인턴 (체험형)',
+    title: '인턴',
+    chip: '체험형',
+    chipClass: 'is-intern',
+    defaults: ['서류 접수', '직무 면접', '인턴 입사', '계약 종료']
+  }
+};
+const PROC_TYPE_ORDER = ['A', 'B', 'C', 'D', 'E'];
+
+function makeProcTrack(type) {
+  const def = PROC_TYPES[type] || PROC_TYPES.A;
+  return { type: def.key, steps: def.defaults.slice() };
+}
+
+function normalizeProcTracks(raw) {
+  if (Array.isArray(raw) && raw.length) {
+    return raw.map(t => {
+      const type = PROC_TYPES[t && t.type] ? t.type : 'A';
+      const steps = Array.isArray(t && t.steps)
+        ? t.steps.map(s => String(s == null ? '' : s))
+        : PROC_TYPES[type].defaults.slice();
+      return { type, steps: steps.length ? steps : [''] };
+    });
+  }
+  return [];
+}
 
 // ─────────────────────────────────────────────────────────────
 // STATE — 이 객체가 모든 데이터의 단일 진실 원천(Single Source of Truth)
@@ -623,15 +702,13 @@ let S = {
   currentStep : 1,
   template    : 'A',
   corp        : 'es',
-  accentColor : '#00b1cc',
-  patternIdx  : 0,
   // STEP 1
   badge    : '',
   mainCopy : '',
   subCopy  : '',
   // STEP 2
   period      : '',
-  procedures  : [],
+  procTracks  : [], // [{type:'A'|'B'|..., steps:['서류 접수',...]}]
   docDeadline : '',
   interviewDate: '',
   announceDate : '',
@@ -667,6 +744,17 @@ function loadSaved() {
     const parsed = JSON.parse(raw);
     // 안전하게 병합
     Object.keys(S).forEach(k => { if (parsed[k] !== undefined) S[k] = parsed[k]; });
+    // 삭제된 법인 키가 저장돼 있으면 기본값으로 복구
+    if (!CORP[S.corp]) {
+      S.corp = 'es';
+    }
+    // 구버전 procedures[] → procTracks 마이그레이션
+    if ((!Array.isArray(S.procTracks) || !S.procTracks.length) && Array.isArray(parsed.procedures) && parsed.procedures.length) {
+      S.procTracks = [{ type: 'A', steps: parsed.procedures.map(String) }];
+    } else {
+      S.procTracks = normalizeProcTracks(S.procTracks);
+    }
+    delete S.procedures;
     return true;
   } catch(e) { return false; }
 }
@@ -734,45 +822,24 @@ function collectCurrentStep() {
 // SIDEBAR EVENTS
 // ─────────────────────────────────────────────────────────────
 function onCorpChange(val) {
-  S.corp = val;
-  const info = CORP[val];
-  if (info) {
-    S.accentColor = info.color;
-    syncSwatches();
-  }
+  S.corp = CORP[val] ? val : 'es';
   renderPreview();
   scheduleAutoSave();
 }
 
-function onColorPick(color, btn) {
-  S.accentColor = color;
-  syncSwatches();
-  renderPreview();
-  scheduleAutoSave();
+function resolveCorp() {
+  return CORP[S.corp] || CORP.es;
 }
 
-function syncSwatches() {
-  document.querySelectorAll('.color-swatch[data-c]').forEach(sw => {
-    sw.classList.toggle('on', sw.dataset.c === S.accentColor);
-  });
+function resolveCorpBg(corp) {
+  return (corp && corp.bg) || BG_DEFAULT;
 }
 
-function selectPattern(idx) {
-  S.patternIdx = idx;
-  document.querySelectorAll('.pat-btn').forEach((b, i) => b.classList.toggle('on', i === idx));
-  renderPreview();
-  scheduleAutoSave();
-}
-
-// ─────────────────────────────────────────────────────────────
-// SIDEBAR SYNC (from state)
-// ─────────────────────────────────────────────────────────────
 function syncSidebar() {
   const st = document.getElementById('sel-template');
   const sc = document.getElementById('sel-corp');
   if (st) st.value = S.template;
-  if (sc) sc.value = S.corp;
-  syncSwatches();
+  if (sc) sc.value = CORP[S.corp] ? S.corp : 'es';
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -800,8 +867,6 @@ function attachFormListeners() {
     bindInput('f-badge',     v => { S.badge    = v; updateCnt('f-badge','cnt-badge',20); });
     bindInput('f-main-copy', v => { S.mainCopy = v; updateCnt('f-main-copy','cnt-main',60); });
     bindInput('f-sub-copy',  v => { S.subCopy  = v; updateCnt('f-sub-copy','cnt-sub',30); });
-    // 패턴 버튼 동기화
-    document.querySelectorAll('.pat-btn').forEach((b, i) => b.classList.toggle('on', i === S.patternIdx));
     // 카운터 초기화
     updateCnt('f-badge','cnt-badge',20);
     updateCnt('f-main-copy','cnt-main',60);
@@ -869,17 +934,6 @@ function buildStep1() {
     <div class="char-cnt" id="cnt-sub">0/30</div>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-    <label class="block text-xs font-bold text-gray-600 mb-3">배경 패턴 스타일</label>
-    <div class="flex gap-3">
-      ${PATTERNS.map((p,i) =>
-        `<button class="pat-btn${i===S.patternIdx?' on':''}" onclick="selectPattern(${i})" title="${p.label}">
-          <div style="width:100%;height:100%;background:${p.g};"></div>
-        </button>`
-      ).join('')}
-    </div>
-  </div>
-
   <div class="tip-box">
     <div class="flex gap-2 items-start">
       <span style="font-size:16px;">💡</span>
@@ -913,14 +967,17 @@ function buildStep2() {
   </div>
 
   <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-    <label class="block text-xs font-bold text-gray-600 mb-2">전형 절차</label>
-    <div id="proc-tags" class="flex flex-wrap gap-2 mb-3 min-h-[28px]">${buildProcTags()}</div>
-    <div class="flex gap-2">
-      <input id="proc-new" type="text" placeholder="절차 입력 후 Enter 또는 + 클릭"
-        class="f-input flex-1" style="flex:1;"
-        onkeydown="if(event.key==='Enter'){event.preventDefault();addProc();}" />
-      <button onclick="addProc()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-colors flex-shrink-0">+</button>
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <label class="block text-xs font-bold text-gray-600 mb-0.5">전형 절차</label>
+        <p class="text-xs text-gray-400">고용 형태(typeA–E)별로 절차를 추가하고, 단계를 직접 편집하세요.</p>
+      </div>
     </div>
+    <div id="proc-tracks">${buildProcTracksEditor()}</div>
+    <button type="button" onclick="addProcTrack()"
+      class="mt-3 w-full py-2.5 border border-dashed border-blue-300 text-blue-600 text-sm font-bold rounded-lg hover:bg-blue-50 transition-colors">
+      + 전형 분류 추가
+    </button>
   </div>
 
   <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
@@ -946,34 +1003,116 @@ function buildStep2() {
 </div>`;
 }
 
-function buildProcTags() {
-  return S.procedures.map((p, i) =>
-    `<span class="proc-tag">
-      ${i > 0 ? '<span style="color:#93c5fd;margin-right:3px;">›</span>' : ''}
-      ${htmlEsc(p)}
-      <button onclick="removeProc(${i})"
-        style="color:#60a5fa;margin-left:3px;font-size:14px;line-height:1;background:none;border:none;cursor:pointer;">×</button>
-    </span>`
-  ).join('');
+function buildProcTypeOptions(selected) {
+  return PROC_TYPE_ORDER.map(key => {
+    const t = PROC_TYPES[key];
+    return `<option value="${key}" ${key === selected ? 'selected' : ''}>type${key}. ${htmlEsc(t.menu)}</option>`;
+  }).join('');
 }
 
-function addProc() {
-  const inp = document.getElementById('proc-new');
-  if (!inp) return;
-  const val = inp.value.trim();
-  if (!val) return;
-  S.procedures.push(val);
-  inp.value = '';
-  const area = document.getElementById('proc-tags');
-  if (area) area.innerHTML = buildProcTags();
+function buildProcTracksEditor() {
+  if (!S.procTracks.length) {
+    return `<p class="text-sm text-gray-400 py-2">등록된 전형 분류가 없습니다. 아래에서 추가해 주세요.</p>`;
+  }
+  return S.procTracks.map((track, ti) => {
+    const def = PROC_TYPES[track.type] || PROC_TYPES.A;
+    const steps = (track.steps && track.steps.length) ? track.steps : [''];
+    const stepRows = steps.map((step, si) => `
+      <div class="proc-step-row">
+        <input type="text" class="f-input" value="${htmlEsc(step)}"
+          placeholder="전형 절차명"
+          oninput="updateProcStep(${ti},${si},this.value)" />
+        <button type="button" class="proc-icon-btn" onclick="moveProcStep(${ti},${si},-1)"
+          ${si === 0 ? 'disabled' : ''} title="위로">▲</button>
+        <button type="button" class="proc-icon-btn" onclick="moveProcStep(${ti},${si},1)"
+          ${si === steps.length - 1 ? 'disabled' : ''} title="아래로">▼</button>
+        <button type="button" class="proc-icon-btn is-danger" onclick="removeProcStep(${ti},${si})"
+          ${steps.length <= 1 ? 'disabled' : ''} title="삭제">×</button>
+      </div>`).join('');
+
+    return `
+    <div class="proc-track-card" data-track="${ti}">
+      <div class="flex items-center gap-2 mb-2">
+        <select class="f-input" style="flex:1;" onchange="changeProcTrackType(${ti},this.value)">
+          ${buildProcTypeOptions(track.type)}
+        </select>
+        <button type="button" class="proc-icon-btn is-danger" onclick="removeProcTrack(${ti})" title="분류 삭제">×</button>
+      </div>
+      <p class="text-[11px] text-gray-400 mb-1">미리보기: ${htmlEsc(def.title)} · ${htmlEsc(def.chip)}</p>
+      <div class="bg-white rounded-lg border border-gray-100 px-2">${stepRows}</div>
+      <button type="button" onclick="addProcStep(${ti})"
+        class="mt-2 w-full py-2 text-sm font-semibold text-blue-600 border border-dashed border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+        + 절차 추가
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function refreshProcTracksEditor() {
+  const area = document.getElementById('proc-tracks');
+  if (area) area.innerHTML = buildProcTracksEditor();
   renderPreview();
   scheduleAutoSave();
 }
 
-function removeProc(i) {
-  S.procedures.splice(i, 1);
-  const area = document.getElementById('proc-tags');
-  if (area) area.innerHTML = buildProcTags();
+function nextUnusedProcType() {
+  const used = new Set(S.procTracks.map(t => t.type));
+  return PROC_TYPE_ORDER.find(k => !used.has(k)) || 'A';
+}
+
+function addProcTrack() {
+  S.procTracks.push(makeProcTrack(nextUnusedProcType()));
+  refreshProcTracksEditor();
+}
+
+function removeProcTrack(ti) {
+  S.procTracks.splice(ti, 1);
+  refreshProcTracksEditor();
+}
+
+function changeProcTrackType(ti, type) {
+  const track = S.procTracks[ti];
+  if (!track || !PROC_TYPES[type]) return;
+  const prev = PROC_TYPES[track.type];
+  const next = PROC_TYPES[type];
+  const wasDefault = prev && track.steps.join('\0') === prev.defaults.join('\0');
+  track.type = type;
+  if (wasDefault || !track.steps.some(s => String(s).trim())) {
+    track.steps = next.defaults.slice();
+  }
+  refreshProcTracksEditor();
+}
+
+function addProcStep(ti) {
+  const track = S.procTracks[ti];
+  if (!track) return;
+  if (!Array.isArray(track.steps)) track.steps = [];
+  track.steps.push('');
+  refreshProcTracksEditor();
+}
+
+function removeProcStep(ti, si) {
+  const track = S.procTracks[ti];
+  if (!track || !Array.isArray(track.steps) || track.steps.length <= 1) return;
+  track.steps.splice(si, 1);
+  refreshProcTracksEditor();
+}
+
+function moveProcStep(ti, si, dir) {
+  const track = S.procTracks[ti];
+  if (!track || !Array.isArray(track.steps)) return;
+  const nj = si + dir;
+  if (nj < 0 || nj >= track.steps.length) return;
+  const tmp = track.steps[si];
+  track.steps[si] = track.steps[nj];
+  track.steps[nj] = tmp;
+  refreshProcTracksEditor();
+}
+
+function updateProcStep(ti, si, val) {
+  const track = S.procTracks[ti];
+  if (!track || !Array.isArray(track.steps)) return;
+  track.steps[si] = val;
   renderPreview();
   scheduleAutoSave();
 }
@@ -1066,7 +1205,7 @@ function updateDept(i, field, val) {
 
 // ─── STEP 4 HTML ───
 function buildStep4() {
-  const corp = CORP[S.corp] || CORP['es'];
+  const corp = resolveCorp();
   const safe = htmlEsc;
   return `
 <div class="space-y-6">
@@ -1091,7 +1230,7 @@ function buildStep4() {
     <ul class="space-y-2 text-xs" style="color:#1d4ed8;">
       <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>우측 미리보기에서 전체 내용을 확인했나요?</li>
       <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>오탈자 및 날짜 정보가 정확한가요?</li>
-      <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>법인명과 강조 컬러가 맞게 설정되었나요?</li>
+      <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>법인명이 맞게 설정되었나요?</li>
     </ul>
   </div>
 
@@ -1126,20 +1265,25 @@ function renderPreview() {
   const canvas = document.getElementById('preview-canvas');
   if (!canvas) return;
 
-  const corp  = CORP[S.corp] || CORP['es'];
-  const color = S.accentColor || '#00b1cc';
-  const pat   = PATTERNS[S.patternIdx] || PATTERNS[0];
+  const corp  = resolveCorp();
+  const color = corp.color || '#00b1cc';
+  const bgSrc = resolveCorpBg(corp);
 
-  // ── 섹션 01: Cover (안티그라비티 bg-basic) ──
+  // ── 섹션 01: Cover (법인별 Figma 배경) ──
   const mainCopyText = S.mainCopy || '스스로 일을 정의하고\n경계 없이 문제를 풀어나갈\n동료를 찾습니다.';
   const badgeText = S.badge || '2026 상반기 상시 채용';
   const subCopyText = S.subCopy || '';
-  const useEsLogo = S.corp === 'es';
+  // 배경 PNG에 CI가 포함되어 있으면 HTML 로고는 자리만 유지(투명)해 레이아웃을 맞춤
+  const logoHtml = corp.logoInBg
+    ? `<div class="pv-corp-logo" id="preview-corp-logo" aria-hidden="true" style="opacity:0;"></div>`
+    : (S.corp === 'es'
+        ? CI_DNES_SVG
+        : `<div class="pv-corp-badge" id="preview-corp-name">${htmlEsc(corp.name)}</div>`);
 
   const s01 = `
-<div class="pv-s01" style="background:${pat.g};">
-  <img class="pv-s01-bg" src="${BG_DATA_URI}" alt="" />
-  <div class="pv-s01-wash" style="background:${color};"></div>
+<div class="pv-s01" style="background:${color};" data-corp="${htmlEsc(S.corp)}">
+  <img class="pv-s01-bg" id="preview-main-bg" src="${bgSrc}" alt="" />
+  <div class="pv-s01-wash" style="background:${color}; opacity:${corp.logoInBg ? '0.06' : '0.12'};"></div>
   <div class="pv-s01-inner">
     <div class="pv-s01-text">
       <span class="pv-badge" id="preview-badge">${htmlEsc(badgeText)}</span>
@@ -1148,9 +1292,7 @@ function renderPreview() {
         ${subCopyText ? `<p class="pv-sub-copy" id="preview-sub-copy">${htmlEsc(subCopyText)}</p>` : `<p class="pv-sub-copy" id="preview-sub-copy" style="display:none;"></p>`}
       </div>
     </div>
-    ${useEsLogo
-      ? CI_DNES_SVG
-      : `<div class="pv-corp-badge" id="preview-corp-name">${htmlEsc(corp.name)}</div>`}
+    ${logoHtml}
   </div>
 </div>`;
 
@@ -1178,20 +1320,35 @@ function renderPreview() {
     <p class="pv-apply-flow">채용 홈페이지  →  채용 공고 확인  →  지원서 작성</p>
   </div>`);
 
-  if (S.procedures.length > 0) {
-    const procItems = S.procedures.map((p, i) =>
-      `${i > 0 ? '<span class="pv-proc-dots" aria-hidden="true"><i></i><i></i><i></i></span>' : ''}
-       <span class="pv-proc-item">${htmlEsc(p)}</span>`
-    ).join('');
+  const visibleTracks = (S.procTracks || []).filter(t =>
+    Array.isArray(t.steps) && t.steps.some(s => String(s).trim())
+  );
+
+  if (visibleTracks.length > 0) {
+    const tracksHtml = visibleTracks.map(track => {
+      const def = PROC_TYPES[track.type] || PROC_TYPES.A;
+      const steps = track.steps.map(s => String(s).trim()).filter(Boolean);
+      const procItems = steps.map((p, i) =>
+        `${i > 0 ? '<span class="pv-proc-dots" aria-hidden="true"><i></i><i></i><i></i></span>' : ''}
+         <span class="pv-proc-item">${htmlEsc(p)}</span>`
+      ).join('');
+      return `<div class="pv-proc-track">
+        <div class="pv-proc-head">
+          <p class="pv-proc-title">${htmlEsc(def.title)}</p>
+          <span class="pv-proc-chip ${def.chipClass}">${htmlEsc(def.chip)}</span>
+        </div>
+        <div class="pv-proc-list">${procItems}</div>
+      </div>`;
+    }).join('');
     s03parts.push(`<div class="pv-info-block">
       <p class="pv-sec-label" style="color:${color};">전형절차</p>
-      <div class="pv-proc-list" id="preview-procedures">${procItems}</div>
+      <div class="pv-proc-tracks" id="preview-procedures">${tracksHtml}</div>
       <p class="pv-note">※면접 대상자에 대하여 사전/현장 과제를 포함한 추가 전형이 진행될 수 있습니다.</p>
     </div>`);
   } else {
     s03parts.push(`<div class="pv-info-block">
       <p class="pv-sec-label" style="color:${color};">전형절차</p>
-      <div class="pv-proc-list" id="preview-procedures"><p class="pv-empty" style="padding:8px 0;text-align:left;">전형 절차를 입력해주세요</p></div>
+      <div class="pv-proc-tracks" id="preview-procedures"><p class="pv-empty" style="padding:8px 0;text-align:left;">전형 절차를 입력해주세요</p></div>
     </div>`);
   }
 
@@ -1481,7 +1638,7 @@ async function downloadImage() {
       imageTimeout: 15000
     });
 
-    const corp = CORP[S.corp] || CORP['es'];
+    const corp = resolveCorp();
     const now  = new Date();
     const ds   = now.getFullYear() + pad2(now.getMonth()+1) + pad2(now.getDate());
     const a    = document.createElement('a');
