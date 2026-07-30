@@ -91,12 +91,33 @@
     .proc-icon-btn.is-danger { color: #94a3b8; }
     .proc-icon-btn.is-danger:hover:not(:disabled) { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
 
-    /* ── Dept row ── */
-    .dept-form-row {
-      display: grid; grid-template-columns: 88px 128px 1fr 34px;
-      gap: 8px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; align-items: start;
+    /* ── Dept / hiring form ── */
+    .hire-group-card {
+      border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; overflow: hidden;
     }
-    .dept-form-row:last-child { border-bottom: none; }
+    .hire-group-card + .hire-group-card { margin-top: 14px; }
+    .hire-group-head {
+      padding: 14px; background: #f8fafc; border-bottom: 1px solid #eef2f7;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .hire-logo-preview {
+      display: flex; align-items: center; justify-content: flex-start; min-height: 30px;
+    }
+    .hire-logo-preview img {
+      height: 30px; width: auto; max-width: 100%; object-fit: contain; object-position: left center;
+    }
+    .hire-logo-fallback {
+      font-size: 15px; font-weight: 700; color: #1e3a47; line-height: 30px;
+    }
+    .dept-row-card {
+      padding: 12px 14px; border-bottom: 1px solid #f1f5f9;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .dept-row-card:last-child { border-bottom: none; }
+    .dept-row-top {
+      display: grid; grid-template-columns: 1fr minmax(120px, 0.9fr) 34px;
+      gap: 8px; align-items: center;
+    }
 
     /* ── Download button ── */
     .dl-btn {
@@ -219,29 +240,31 @@
     .pv-proc-title {
       margin: 0; font-size: 28px; font-weight: 700; line-height: 1.4; color: #1e3a47;
     }
+    /* Figma chip_계약형태 (265:726) */
     .pv-proc-chip {
       display: inline-flex; align-items: center; justify-content: center;
-      height: 28px; padding: 0 10px; border-radius: 7px;
-      font-size: 16px; font-weight: 500; line-height: 1.4;
+      height: 28px; padding: 3px 8px; border-radius: 7px;
+      font-size: 16px; font-weight: 500; line-height: 1.4; white-space: nowrap;
     }
+    .pv-proc-chip .chip-sub { font-size: 14px; line-height: 1.4; }
     .pv-proc-chip.is-regular { background: rgba(0,177,204,.15); color: #00b1cc; }
-    .pv-proc-chip.is-contract { background: rgba(98,196,0,.15); color: #5fb10d; }
+    .pv-proc-chip.is-contract,
+    .pv-proc-chip.is-contract-convert { background: rgba(98,196,0,.15); color: #5fb10d; }
+    .pv-proc-chip.is-experience,
     .pv-proc-chip.is-intern { background: rgba(204,119,0,.15); color: #c80; }
-    .pv-proc-list { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+    .pv-proc-chip.is-convert { background: rgba(125,152,165,.15); color: #7d98a5; }
+    .pv-proc-list {
+      display: flex; flex-wrap: nowrap; align-items: stretch;
+      justify-content: space-between; gap: 10px; width: 100%;
+    }
     .pv-proc-item {
+      flex: 1 1 0; min-width: 0;
       display: flex; align-items: center; justify-content: center;
-      min-width: 162px; height: 73px; padding: 0 28px;
+      height: 73px; padding: 0 12px;
       background: #f7f8fa; border-radius: 10px;
       font-size: 22px; font-weight: 600; line-height: 1.5; color: #1e3a47;
       text-align: center; word-break: keep-all;
     }
-    .pv-proc-dots {
-      display: inline-flex; align-items: center; gap: 4px; width: 20px; flex-shrink: 0; justify-content: center;
-    }
-    .pv-proc-dots i {
-      width: 8px; height: 8px; border-radius: 50%; background: #00b1cc; display: block; opacity: .55;
-    }
-    .pv-proc-dots i:nth-child(2) { opacity: .25; background: #7d98a5; }
     .pv-note {
       margin: 0; font-size: 20px; font-weight: 400; line-height: 1.45; letter-spacing: -.2px; color: #7d98a5;
     }
@@ -259,30 +282,72 @@
     }
 
     /* ── Section 04: 모집부문 ── */
-    .pv-s04 { width: 900px; background: #fff; padding: 0 60px 80px; }
-    .pv-s04 > .pv-sec-label { margin-bottom: 42px; }
+    .pv-s04 { width: 900px; background: #fff; padding: 0 60px 80px; display: flex; flex-direction: column; gap: 60px; }
+    .pv-s04 > .pv-sec-label { margin: 0; }
+    .pv-hire-list { display: flex; flex-direction: column; gap: 70px; width: 100%; }
+    .pv-hire-block { display: flex; flex-direction: column; gap: 32px; width: 100%; }
+    .pv-hire-head { display: flex; flex-direction: column; align-items: flex-start; gap: 24px; width: 100%; }
+    .pv-hire-logo {
+      display: block; height: 30px; width: auto; max-width: 100%;
+      object-fit: contain; object-position: left center; align-self: flex-start;
+    }
+    .pv-hire-logo-fallback {
+      margin: 0; font-size: 22px; font-weight: 700; color: #1e3a47; line-height: 30px; height: 30px;
+      align-self: flex-start;
+    }
+    .pv-hire-intro {
+      margin: 0; font-size: 20px; font-weight: 400; line-height: 1.6; color: #162d37;
+      white-space: pre-wrap; word-break: keep-all;
+    }
     .pv-dept-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .pv-dept-table thead th {
       background: #f7f8fa; color: #1e3a47; font-size: 22px; font-weight: 700;
-      text-align: left; padding: 27px 16px; border: none;
+      text-align: left; padding: 18px 16px; border: none; border-bottom: 1px solid #ced4da;
+      line-height: 1.6; vertical-align: middle;
     }
     .pv-dept-table tbody td {
-      padding: 27px 16px; vertical-align: top; border-bottom: 1px solid #e5e7eb;
-      color: #1e3a47; word-break: keep-all; white-space: pre-wrap; line-height: 1.5;
+      padding: 16px; vertical-align: top; border-bottom: 1px solid #ced4da;
+      color: #1e3a47; word-break: keep-all; line-height: 1.6;
+      text-align: left;
     }
-    .pv-dept-table tbody tr:last-child td { border-bottom: none; }
-    .pv-dept-cat { font-size: 26px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; }
+    .pv-dept-table tbody tr:last-child td { border-bottom: 1px solid #ced4da; }
+    .pv-dept-cat-cell {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+    }
+    .pv-dept-cat {
+      font-size: 24px; font-weight: 600; line-height: 1.6; margin: 0;
+      text-align: left; width: 100%;
+    }
     .pv-dept-chip {
       display: inline-flex; align-items: center; justify-content: center;
-      height: 28px; padding: 0 8px; border-radius: 7px;
-      font-size: 16px; font-weight: 500; line-height: 1.4;
+      height: 28px; padding: 3px 8px; border-radius: 7px;
+      font-size: 16px; font-weight: 500; line-height: 1.4; white-space: nowrap;
+      align-self: flex-start; flex-shrink: 0;
     }
+    .pv-dept-chip .chip-sub { font-size: 14px; line-height: 1.4; }
     .pv-dept-chip.is-regular { background: rgba(0,177,204,.15); color: #00b1cc; }
-    .pv-dept-chip.is-contract { background: rgba(98,196,0,.15); color: #5fb10d; }
+    .pv-dept-chip.is-contract,
+    .pv-dept-chip.is-contract-convert { background: rgba(98,196,0,.15); color: #5fb10d; }
+    .pv-dept-chip.is-experience,
     .pv-dept-chip.is-intern { background: rgba(204,119,0,.15); color: #c80; }
-    .pv-dept-title { font-size: 26px; font-weight: 700; line-height: 1.4; margin: 0 0 4px; }
-    .pv-dept-eng { margin: 0; font-size: 20px; font-weight: 500; color: #7d98a5; line-height: 1.4; }
-    .pv-dept-tasks { margin: 0; font-size: 20px; font-weight: 500; line-height: 1.55; color: #1e3a47; }
+    .pv-dept-chip.is-convert { background: rgba(125,152,165,.15); color: #7d98a5; }
+    .pv-dept-job {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0;
+    }
+    .pv-dept-title { font-size: 24px; font-weight: 600; line-height: 1.6; margin: 0; text-align: left; }
+    .pv-dept-eng { margin: 0; font-size: 20px; font-weight: 500; color: #1e3a47; line-height: 1.6; text-align: left; }
+    .pv-dept-body {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+    }
+    .pv-dept-tasks {
+      margin: 0; font-size: 19px; font-weight: 500; line-height: 1.6; color: #1e3a47;
+      text-align: left; white-space: pre-wrap;
+    }
+    .pv-dept-team { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.6; color: #7d98a5; text-align: left; }
+    .pv-hire-banner {
+      display: block; width: 100%; height: auto;
+      border: none; border-radius: 0; padding: 0; margin: 0;
+    }
     .pv-empty { font-size: 20px; color: #ced4da; text-align: center; padding: 40px 0; margin: 0; }
 
     /* ── Section 05: Company HTML (Figma section04_company) ── */
@@ -398,6 +463,10 @@
     .pv-s05-intro {
       width: 900px; background: #f7f8fa; padding: 90px 60px;
       display: flex; flex-direction: column; gap: 135px;
+    }
+    .pv-s05-welfare {
+      width: 900px; background: #fff; padding: 90px 60px 80px;
+      display: flex; flex-direction: column;
     }
     .pv-s05-sec { display: flex; flex-direction: column; gap: 40px; }
     .pv-s05-sec.gap45 { gap: 45px; }
@@ -593,106 +662,216 @@ const CORP = {
     color: '#00b1cc',
     bg: 'assets/bg/bg-es.png',
     logoInBg: true,
+    logo: 'assets/logo/logo-dn.png',
     heading: '경계 없이 문제를 푸는\n최적의 파트너, 대학내일ES',
-    intro: '대학내일ES는 마케팅, HR, 트렌드/인사이트, 미디어 영역에서\n사람, 브랜드, 조직의 성장을 도와\n비즈니스 임팩트를 만드는 종합 마케팅 에이전시입니다.'
+    intro: '대학내일ES는 마케팅, HR, 트렌드/인사이트, 미디어 영역에서\n사람, 브랜드, 조직의 성장을 도와\n비즈니스 임팩트를 만드는 종합 마케팅 에이전시입니다.',
+    hiringIntro: '세대와 시대를 연결하는 종합 마케팅 에이전시입니다. 시대 변화의 흐름과 맥락을 정확하게 읽고,\n브랜드도 몰랐던 진짜 문제를 정의합니다. 이를 통해 브랜드를 위한 최적의 솔루션을 찾아냅니다.'
   },
   percent51: {
     name: '51percent',
     color: '#1a1a1a',
     bg: 'assets/bg/bg-51percent.png',
     logoInBg: true,
+    logo: 'assets/logo/logo-51percent.png',
     heading: '브랜딩과 세일즈를 선명하게 푸는\n51percent',
-    intro: '51percent는 브랜딩과 세일즈 아젠다를 가장 유효한 솔루션으로\n풀어내는 선명한 에이전시입니다.\n명확한 이해를 기반으로 최적의 솔루션 믹스를 제안합니다.'
+    intro: '51percent는 브랜딩과 세일즈 아젠다를 가장 유효한 솔루션으로\n풀어내는 선명한 에이전시입니다.\n명확한 이해를 기반으로 최적의 솔루션 믹스를 제안합니다.',
+    hiringIntro: '브랜딩과 세일즈 아젠다를 가장 유효한 솔루션으로 풀어내는 선명한 에이전시입니다. 명확한 이해를 기반으로 최적의 솔루션 믹스를 제안하며 1% 더 파고드는 주도성을 갖고 가능케합니다.'
   },
   positive: {
     name: 'the positive',
     color: '#2f6b4f',
     bg: 'assets/bg/bg-thepositive.png',
     logoInBg: true,
+    logo: 'assets/logo/logo-positive.png',
     heading: '브랜드에 더 포지티브한\n솔루션을 제시합니다',
-    intro: '더포지티브는 브랜드/마케팅 커뮤니케이션 파트너입니다.\n차별적 감정 인사이트로 브랜드에 가장 포지티브한 길을 제시합니다.'
+    intro: '더포지티브는 브랜드/마케팅 커뮤니케이션 파트너입니다.\n차별적 감정 인사이트로 브랜드에 가장 포지티브한 길을 제시합니다.',
+    hiringIntro: '브랜드에 더 포지티브한 솔루션을 제시하는 브랜드/마케팅 커뮤니케이션 파트너입니다. 더포지티브만의 차별적 감정 인사이트로 브랜드에 가장 포지티브한 길을 제시합니다.'
   },
   webetter: {
     name: 'WE+BETTER',
     color: '#4a5568',
     bg: 'assets/bg/bg-webetter.png',
     logoInBg: true,
+    logo: 'assets/logo/logo-webetter.png',
     heading: '최적의 미디어 솔루션을 제안하는\nWE+BETTER',
-    intro: '위베러는 미디어 솔루션 에이전시입니다.\n미디어 전문성과 틀을 깨는 유기적 시너지로 고객의 문제를 해결합니다.'
+    intro: '위베러는 미디어 솔루션 에이전시입니다.\n미디어 전문성과 틀을 깨는 유기적 시너지로 고객의 문제를 해결합니다.',
+    hiringIntro: '최적의 미디어 솔루션을 제안하는 미디어 솔루션 에이전시입니다. 미디어 전문성과 틀을 깨는 방식의 유기적 시너지로 고객의 문제를 해결합니다.'
   },
   conceptual: {
     name: '컨셉추얼',
     color: '#2563eb',
     bg: 'assets/bg/bg-conceptual.png',
     logoInBg: true,
+    logo: '',
     heading: '컨셉으로 문제를 정의하는\n컨셉추얼',
-    intro: '컨셉추얼은 브랜드와 캠페인의 핵심 컨셉을 설계하는\n크리에이티브 파트너입니다.'
+    intro: '컨셉추얼은 브랜드와 캠페인의 핵심 컨셉을 설계하는\n크리에이티브 파트너입니다.',
+    hiringIntro: '컨셉추얼은 브랜드와 캠페인의 핵심 컨셉을 설계하는 크리에이티브 파트너입니다.'
   }
 };
+const CORP_ORDER = ['es', 'percent51', 'positive', 'webetter', 'conceptual'];
 
 const STEP_LABELS = ['메인 비주얼','모집요강','모집부문','최종 미리보기'];
 
-// 전형절차 고용 형태 (typeA–E)
-const PROC_TYPES = {
-  A: {
-    key: 'A',
+// Figma chip_계약형태 (265:726) — 계약형태 칩
+const PROC_CHIPS = {
+  regular: {
+    key: 'regular',
     menu: '정규직',
-    title: '신입/경력',
-    chip: '정규직',
-    chipClass: 'is-regular',
-    defaults: ['서류 접수', '면접 전형', '조직 적합성 면접', '최종 합격']
+    label: '정규직',
+    chipClass: 'is-regular'
   },
-  B: {
-    key: 'B',
-    menu: '계약직 (전환형)',
-    title: '계약직',
-    chip: '전환형',
-    chipClass: 'is-contract',
-    defaults: ['서류 접수', '면접 전형', '최종 합격', '근무 / 전환심사']
-  },
-  C: {
-    key: 'C',
-    menu: '인턴 (전환형)',
-    title: '인턴',
-    chip: '전환형',
-    chipClass: 'is-contract',
-    defaults: ['서류 접수', '면접 전형', '인턴 입사', '전환 심사']
-  },
-  D: {
-    key: 'D',
+  contract: {
+    key: 'contract',
     menu: '계약직',
-    title: '계약직',
-    chip: '계약직',
-    chipClass: 'is-contract',
-    defaults: ['서류 접수', '면접 전형', '최종 합격']
+    label: '계약직',
+    chipClass: 'is-contract'
   },
-  E: {
-    key: 'E',
-    menu: '인턴 (체험형)',
-    title: '인턴',
-    chip: '체험형',
-    chipClass: 'is-intern',
-    defaults: ['서류 접수', '직무 면접', '인턴 입사', '계약 종료']
+  convert: {
+    key: 'convert',
+    menu: '전환형',
+    label: '전환형',
+    chipClass: 'is-convert'
+  },
+  experience: {
+    key: 'experience',
+    menu: '체험형',
+    label: '체험형',
+    chipClass: 'is-experience'
+  },
+  contractConvert: {
+    key: 'contractConvert',
+    menu: '계약직(전환형)',
+    label: '계약직',
+    labelSub: '(전환형)',
+    chipClass: 'is-contract-convert'
   }
 };
-const PROC_TYPE_ORDER = ['A', 'B', 'C', 'D', 'E'];
+const PROC_CHIP_ORDER = ['regular', 'contract', 'convert', 'experience', 'contractConvert'];
+const PROC_DEFAULT_STEPS = ['서류 접수', '면접 전형', '최종 합격'];
 
-function makeProcTrack(type) {
-  const def = PROC_TYPES[type] || PROC_TYPES.A;
-  return { type: def.key, steps: def.defaults.slice() };
+// 구버전 typeA–E → 새 모델 매핑
+const LEGACY_PROC_TYPE = {
+  A: { category: '신입/경력', chip: 'regular', defaults: ['서류 접수', '면접 전형', '조직 적합성 면접', '최종 합격'] },
+  B: { category: '계약직', chip: 'convert', defaults: ['서류 접수', '면접 전형', '최종 합격', '근무 / 전환심사'] },
+  C: { category: '인턴', chip: 'convert', defaults: ['서류 접수', '면접 전형', '인턴 입사', '전환 심사'] },
+  D: { category: '계약직', chip: 'contract', defaults: ['서류 접수', '면접 전형', '최종 합격'] },
+  E: { category: '인턴', chip: 'experience', defaults: ['서류 접수', '직무 면접', '인턴 입사', '계약 종료'] }
+};
+
+function resolveProcChip(key) {
+  return PROC_CHIPS[key] || PROC_CHIPS.regular;
+}
+
+function renderProcChipHtml(chipKey) {
+  const def = resolveProcChip(chipKey);
+  if (def.labelSub) {
+    return `<span class="pv-proc-chip ${def.chipClass}"><span>${htmlEsc(def.label)}</span><span class="chip-sub">${htmlEsc(def.labelSub)}</span></span>`;
+  }
+  return `<span class="pv-proc-chip ${def.chipClass}">${htmlEsc(def.label)}</span>`;
+}
+
+function makeProcTrack(category, chip) {
+  return {
+    category: category == null ? '' : String(category),
+    chip: PROC_CHIPS[chip] ? chip : 'regular',
+    steps: PROC_DEFAULT_STEPS.slice()
+  };
 }
 
 function normalizeProcTracks(raw) {
-  if (Array.isArray(raw) && raw.length) {
-    return raw.map(t => {
-      const type = PROC_TYPES[t && t.type] ? t.type : 'A';
-      const steps = Array.isArray(t && t.steps)
+  if (!Array.isArray(raw) || !raw.length) return [];
+  return raw.map(t => {
+    // 신모델: { category, chip, steps }
+    if (t && (t.category !== undefined || (t.chip && PROC_CHIPS[t.chip]))) {
+      const chip = PROC_CHIPS[t.chip] ? t.chip : 'regular';
+      const steps = Array.isArray(t.steps)
         ? t.steps.map(s => String(s == null ? '' : s))
-        : PROC_TYPES[type].defaults.slice();
-      return { type, steps: steps.length ? steps : [''] };
+        : PROC_DEFAULT_STEPS.slice();
+      return {
+        category: String(t.category == null ? '' : t.category),
+        chip,
+        steps: steps.length ? steps : ['']
+      };
+    }
+    // 구모델: { type: 'A'|'B'|..., steps }
+    const legacy = LEGACY_PROC_TYPE[t && t.type] || LEGACY_PROC_TYPE.A;
+    const steps = Array.isArray(t && t.steps)
+      ? t.steps.map(s => String(s == null ? '' : s))
+      : legacy.defaults.slice();
+    return {
+      category: legacy.category,
+      chip: legacy.chip,
+      steps: steps.length ? steps : ['']
+    };
+  });
+}
+
+function renderDeptChipHtml(chipKey) {
+  const def = resolveProcChip(chipKey);
+  if (def.labelSub) {
+    return `<span class="pv-dept-chip ${def.chipClass}"><span>${htmlEsc(def.label)}</span><span class="chip-sub">${htmlEsc(def.labelSub)}</span></span>`;
+  }
+  return `<span class="pv-dept-chip ${def.chipClass}">${htmlEsc(def.label)}</span>`;
+}
+
+function makeDeptRowData() {
+  return { category: '', chip: 'regular', title: '', tasks: '', team: '' };
+}
+
+function makeHiringGroup(corpKey) {
+  const key = CORP[corpKey] ? corpKey : 'es';
+  const corp = CORP[key];
+  return {
+    corpKey: key,
+    intro: corp.hiringIntro || corp.intro || '',
+    departments: [makeDeptRowData()]
+  };
+}
+
+function normalizeDeptRow(d) {
+  return {
+    category: String(d && d.category != null ? d.category : ''),
+    chip: d && PROC_CHIPS[d.chip] ? d.chip : 'regular',
+    title: String(d && d.title != null ? d.title : ''),
+    tasks: String(d && d.tasks != null ? d.tasks : ''),
+    team: String(d && d.team != null ? d.team : '')
+  };
+}
+
+function normalizeHiringGroups(raw, legacyDepartments, fallbackCorp) {
+  if (Array.isArray(raw) && raw.length) {
+    return raw.map(g => {
+      const corpKey = CORP[g && g.corpKey] ? g.corpKey : (CORP[fallbackCorp] ? fallbackCorp : 'es');
+      const corp = CORP[corpKey];
+      const departments = Array.isArray(g && g.departments)
+        ? g.departments.map(normalizeDeptRow)
+        : [makeDeptRowData()];
+      const intro = g && g.intro != null
+        ? String(g.intro)
+        : (corp.hiringIntro || corp.intro || '');
+      return { corpKey, intro, departments: departments.length ? departments : [makeDeptRowData()] };
     });
   }
+  if (Array.isArray(legacyDepartments) && legacyDepartments.length) {
+    const key = CORP[fallbackCorp] ? fallbackCorp : 'es';
+    return [{
+      corpKey: key,
+      intro: (CORP[key].hiringIntro || CORP[key].intro || ''),
+      departments: legacyDepartments.map(normalizeDeptRow)
+    }];
+  }
   return [];
+}
+
+function countHiringDepartments() {
+  return (S.hiringGroups || []).reduce((n, g) => n + ((g.departments && g.departments.length) || 0), 0);
+}
+
+function corpLogoHtml(corp, className) {
+  if (corp && corp.logo) {
+    return `<img class="${className}" src="${corp.logo}" alt="${htmlEsc(corp.name)}" />`;
+  }
+  return `<p class="pv-hire-logo-fallback">${htmlEsc((corp && corp.name) || '')}</p>`;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -708,12 +887,14 @@ let S = {
   subCopy  : '',
   // STEP 2
   period      : '',
-  procTracks  : [], // [{type:'A'|'B'|..., steps:['서류 접수',...]}]
+  procTracks  : [], // [{category:'신입', chip:'regular', steps:['서류 접수',...]}]
   docDeadline : '',
   interviewDate: '',
   announceDate : '',
   // STEP 3
-  departments : []   // [{category, title, tasks}]
+  hiringGroups: [], // [{corpKey, intro, departments:[{category,chip,title,tasks,team}]}]
+  // STEP 4
+  includeUnivSub: true // Figma unives-sub (원칙 / 일하는 방식)
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -748,13 +929,17 @@ function loadSaved() {
     if (!CORP[S.corp]) {
       S.corp = 'es';
     }
-    // 구버전 procedures[] → procTracks 마이그레이션
+    // 구버전 procedures[] / typeA–E → 새 procTracks 마이그레이션
     if ((!Array.isArray(S.procTracks) || !S.procTracks.length) && Array.isArray(parsed.procedures) && parsed.procedures.length) {
-      S.procTracks = [{ type: 'A', steps: parsed.procedures.map(String) }];
+      S.procTracks = [{ category: '신입/경력', chip: 'regular', steps: parsed.procedures.map(String) }];
     } else {
       S.procTracks = normalizeProcTracks(S.procTracks);
     }
     delete S.procedures;
+    // 구버전 departments[] → hiringGroups 마이그레이션
+    S.hiringGroups = normalizeHiringGroups(parsed.hiringGroups || S.hiringGroups, parsed.departments, S.corp);
+    delete S.departments;
+    if (typeof S.includeUnivSub !== 'boolean') S.includeUnivSub = true;
     return true;
   } catch(e) { return false; }
 }
@@ -970,7 +1155,7 @@ function buildStep2() {
     <div class="flex items-start justify-between gap-3 mb-3">
       <div>
         <label class="block text-xs font-bold text-gray-600 mb-0.5">전형 절차</label>
-        <p class="text-xs text-gray-400">고용 형태(typeA–E)별로 절차를 추가하고, 단계를 직접 편집하세요.</p>
+        <p class="text-xs text-gray-400">채용분류는 직접 입력하고, 계약형태 칩은 드롭다운에서 선택하세요.</p>
       </div>
     </div>
     <div id="proc-tracks">${buildProcTracksEditor()}</div>
@@ -1003,10 +1188,10 @@ function buildStep2() {
 </div>`;
 }
 
-function buildProcTypeOptions(selected) {
-  return PROC_TYPE_ORDER.map(key => {
-    const t = PROC_TYPES[key];
-    return `<option value="${key}" ${key === selected ? 'selected' : ''}>type${key}. ${htmlEsc(t.menu)}</option>`;
+function buildProcChipOptions(selected) {
+  return PROC_CHIP_ORDER.map(key => {
+    const t = PROC_CHIPS[key];
+    return `<option value="${key}" ${key === selected ? 'selected' : ''}>${htmlEsc(t.menu)}</option>`;
   }).join('');
 }
 
@@ -1015,7 +1200,6 @@ function buildProcTracksEditor() {
     return `<p class="text-sm text-gray-400 py-2">등록된 전형 분류가 없습니다. 아래에서 추가해 주세요.</p>`;
   }
   return S.procTracks.map((track, ti) => {
-    const def = PROC_TYPES[track.type] || PROC_TYPES.A;
     const steps = (track.steps && track.steps.length) ? track.steps : [''];
     const stepRows = steps.map((step, si) => `
       <div class="proc-step-row">
@@ -1033,12 +1217,16 @@ function buildProcTracksEditor() {
     return `
     <div class="proc-track-card" data-track="${ti}">
       <div class="flex items-center gap-2 mb-2">
-        <select class="f-input" style="flex:1;" onchange="changeProcTrackType(${ti},this.value)">
-          ${buildProcTypeOptions(track.type)}
+        <input type="text" class="f-input" style="flex:1.2;min-width:0;"
+          value="${htmlEsc(track.category || '')}"
+          placeholder="채용분류 (예: 신입, 계약직, 인턴)"
+          oninput="updateProcCategory(${ti},this.value)" />
+        <select class="f-input" style="flex:1;min-width:120px;" onchange="changeProcChip(${ti},this.value)"
+          title="계약형태 칩">
+          ${buildProcChipOptions(track.chip)}
         </select>
         <button type="button" class="proc-icon-btn is-danger" onclick="removeProcTrack(${ti})" title="분류 삭제">×</button>
       </div>
-      <p class="text-[11px] text-gray-400 mb-1">미리보기: ${htmlEsc(def.title)} · ${htmlEsc(def.chip)}</p>
       <div class="bg-white rounded-lg border border-gray-100 px-2">${stepRows}</div>
       <button type="button" onclick="addProcStep(${ti})"
         class="mt-2 w-full py-2 text-sm font-semibold text-blue-600 border border-dashed border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
@@ -1055,13 +1243,8 @@ function refreshProcTracksEditor() {
   scheduleAutoSave();
 }
 
-function nextUnusedProcType() {
-  const used = new Set(S.procTracks.map(t => t.type));
-  return PROC_TYPE_ORDER.find(k => !used.has(k)) || 'A';
-}
-
 function addProcTrack() {
-  S.procTracks.push(makeProcTrack(nextUnusedProcType()));
+  S.procTracks.push(makeProcTrack('', 'regular'));
   refreshProcTracksEditor();
 }
 
@@ -1070,16 +1253,18 @@ function removeProcTrack(ti) {
   refreshProcTracksEditor();
 }
 
-function changeProcTrackType(ti, type) {
+function updateProcCategory(ti, val) {
   const track = S.procTracks[ti];
-  if (!track || !PROC_TYPES[type]) return;
-  const prev = PROC_TYPES[track.type];
-  const next = PROC_TYPES[type];
-  const wasDefault = prev && track.steps.join('\0') === prev.defaults.join('\0');
-  track.type = type;
-  if (wasDefault || !track.steps.some(s => String(s).trim())) {
-    track.steps = next.defaults.slice();
-  }
+  if (!track) return;
+  track.category = val;
+  renderPreview();
+  scheduleAutoSave();
+}
+
+function changeProcChip(ti, chip) {
+  const track = S.procTracks[ti];
+  if (!track || !PROC_CHIPS[chip]) return;
+  track.chip = chip;
   refreshProcTracksEditor();
 }
 
@@ -1118,29 +1303,26 @@ function updateProcStep(ti, si, val) {
 }
 
 // ─── STEP 3 HTML ───
+function buildCorpOptions(selected) {
+  return CORP_ORDER.map(key => {
+    const c = CORP[key];
+    return `<option value="${key}" ${key === selected ? 'selected' : ''}>${htmlEsc(c.name)}</option>`;
+  }).join('');
+}
+
 function buildStep3() {
   return `
 <div class="space-y-5">
   <div>
     <h1 class="text-xl font-extrabold text-gray-900 mb-0.5">STEP 3. 모집부문</h1>
-    <p class="text-sm text-gray-400">모집 부문을 추가하고 직무 정보를 입력해 주세요.</p>
+    <p class="text-sm text-gray-400">채용 법인을 선택한 뒤, 직무 정보를 입력해 주세요.</p>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-    <div class="dept-form-row px-4 py-2 bg-gray-50 border-b border-gray-200">
-      <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">분류</span>
-      <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">직무명</span>
-      <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">주요업무</span>
-      <span></span>
-    </div>
-    <div id="dept-rows" class="divide-y divide-gray-100 px-4">
-      ${S.departments.map((d, i) => buildDeptRow(d, i)).join('')}
-    </div>
-  </div>
+  <div id="hire-groups">${buildHiringGroupsEditor()}</div>
 
-  <button onclick="addDept()"
+  <button type="button" onclick="addHiringGroup()"
     class="w-full py-3 border-2 border-dashed border-blue-200 rounded-xl text-sm font-bold text-blue-500 hover:bg-blue-50 hover:border-blue-400 transition-colors flex items-center justify-center gap-2">
-    <span style="font-size:20px;line-height:1;">+</span> 모집 부문 추가
+    <span style="font-size:20px;line-height:1;">+</span> 채용 법인 추가
   </button>
 
   <div class="tip-box">
@@ -1148,65 +1330,155 @@ function buildStep3() {
       <span style="font-size:16px;">💡</span>
       <div class="text-xs text-yellow-700">
         <p class="font-bold mb-0.5">입력 팁</p>
-        <p>주요업무는 줄바꿈(Enter)으로 항목을 구분하면 미리보기에 그대로 반영됩니다.</p>
+        <p>법인 선택 시 로고·소개가 자동으로 채워집니다. 소개 문구는 수정할 수 있고, 모집팀은 선택 입력입니다.</p>
       </div>
     </div>
   </div>
 </div>`;
 }
 
-function buildDeptRow(d, i) {
-  const safe = htmlEsc;
-  return `<div class="dept-form-row" id="dr-${i}">
-    <input type="text" placeholder="분류" value="${safe(d.category||'')}"
-      class="f-input" style="font-size:12px;padding:7px 8px;"
-      oninput="updateDept(${i},'category',this.value)" />
-    <input type="text" placeholder="직무명" value="${safe(d.title||'')}"
-      class="f-input" style="font-size:12px;padding:7px 8px;"
-      oninput="updateDept(${i},'title',this.value)" />
-    <textarea placeholder="주요 업무 내용" rows="3"
-      class="f-textarea" style="font-size:12px;padding:7px 8px;"
-      oninput="updateDept(${i},'tasks',this.value)">${safe(d.tasks||'')}</textarea>
-    <button onclick="removeDept(${i})"
-      style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#f87171;background:none;border:none;cursor:pointer;font-size:18px;border-radius:6px;margin-top:2px;"
-      onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'"
-      title="삭제">×</button>
+function buildHiringGroupsEditor() {
+  if (!S.hiringGroups.length) {
+    return `<p class="text-sm text-gray-400 py-3">등록된 채용 법인이 없습니다. 아래에서 추가해 주세요.</p>`;
+  }
+  return S.hiringGroups.map((g, gi) => buildHiringGroupCard(g, gi)).join('');
+}
+
+function buildHiringGroupCard(g, gi) {
+  const corp = CORP[g.corpKey] || CORP.es;
+  const logoPreview = corp.logo
+    ? `<img src="${corp.logo}" alt="${htmlEsc(corp.name)}" />`
+    : `<span class="hire-logo-fallback">${htmlEsc(corp.name)}</span>`;
+  const deptRows = (g.departments || []).map((d, di) => buildDeptRow(d, gi, di)).join('');
+
+  return `
+  <div class="hire-group-card" data-group="${gi}">
+    <div class="hire-group-head">
+      <div class="flex items-center gap-2">
+        <select class="f-input" style="flex:1;" onchange="changeHiringCorp(${gi},this.value)">
+          ${buildCorpOptions(g.corpKey)}
+        </select>
+        <button type="button" class="proc-icon-btn is-danger" onclick="removeHiringGroup(${gi})" title="법인 삭제">×</button>
+      </div>
+      <div class="hire-logo-preview" id="hire-logo-${gi}">${logoPreview}</div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-1">법인 소개</label>
+        <textarea class="f-textarea" rows="3" style="font-size:12px;"
+          placeholder="법인 소개 문구"
+          oninput="updateHiringIntro(${gi},this.value)">${htmlEsc(g.intro || '')}</textarea>
+      </div>
+    </div>
+    <div class="px-3 py-2 bg-white border-b border-gray-100">
+      <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">모집 직무</p>
+    </div>
+    <div id="hire-depts-${gi}">${deptRows || '<p class="text-sm text-gray-400 px-4 py-3">직무가 없습니다.</p>'}</div>
+    <div class="p-3 bg-gray-50 border-t border-gray-100">
+      <button type="button" onclick="addDept(${gi})"
+        class="w-full py-2 text-sm font-semibold text-blue-600 border border-dashed border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+        + 직무 추가
+      </button>
+    </div>
   </div>`;
 }
 
-function addDept() {
-  S.departments.push({ category:'', title:'', tasks:'' });
-  const rows = document.getElementById('dept-rows');
-  if (rows) {
-    const idx = S.departments.length - 1;
-    const tmp = document.createElement('div');
-    tmp.innerHTML = buildDeptRow(S.departments[idx], idx);
-    rows.appendChild(tmp.firstElementChild);
-  }
+function buildDeptRow(d, gi, di) {
+  const safe = htmlEsc;
+  return `
+  <div class="dept-row-card" id="dr-${gi}-${di}">
+    <div class="dept-row-top">
+      <input type="text" placeholder="분류 (예: 신입, 계약직, 인턴)" value="${safe(d.category||'')}"
+        class="f-input" style="font-size:12px;padding:7px 8px;"
+        oninput="updateDept(${gi},${di},'category',this.value)" />
+      <select class="f-input" style="font-size:12px;padding:7px 8px;"
+        onchange="updateDept(${gi},${di},'chip',this.value)" title="계약형태 칩">
+        ${buildProcChipOptions(d.chip || 'regular')}
+      </select>
+      <button type="button" onclick="removeDept(${gi},${di})"
+        class="proc-icon-btn is-danger" title="삭제">×</button>
+    </div>
+    <textarea placeholder="직무명&#10;영문명 (선택)" rows="2"
+      class="f-textarea" style="font-size:12px;padding:7px 8px;"
+      oninput="updateDept(${gi},${di},'title',this.value)">${safe(d.title||'')}</textarea>
+    <textarea placeholder="주요업무 (Enter로 줄바꿈)" rows="3"
+      class="f-textarea" style="font-size:12px;padding:7px 8px;"
+      oninput="updateDept(${gi},${di},'tasks',this.value)">${safe(d.tasks||'')}</textarea>
+    <input type="text" placeholder="모집팀 (선택)" value="${safe(d.team||'')}"
+      class="f-input" style="font-size:12px;padding:7px 8px;"
+      oninput="updateDept(${gi},${di},'team',this.value)" />
+  </div>`;
+}
+
+function refreshHiringGroupsEditor() {
+  const area = document.getElementById('hire-groups');
+  if (area) area.innerHTML = buildHiringGroupsEditor();
   renderPreview();
   scheduleAutoSave();
 }
 
-function removeDept(i) {
-  S.departments.splice(i, 1);
-  const rows = document.getElementById('dept-rows');
-  if (rows) rows.innerHTML = S.departments.map(buildDeptRow).join('');
+function nextUnusedHiringCorp() {
+  const used = new Set((S.hiringGroups || []).map(g => g.corpKey));
+  return CORP_ORDER.find(k => !used.has(k)) || 'es';
+}
+
+function addHiringGroup() {
+  S.hiringGroups.push(makeHiringGroup(nextUnusedHiringCorp()));
+  refreshHiringGroupsEditor();
+}
+
+function removeHiringGroup(gi) {
+  S.hiringGroups.splice(gi, 1);
+  refreshHiringGroupsEditor();
+}
+
+function changeHiringCorp(gi, corpKey) {
+  const group = S.hiringGroups[gi];
+  if (!group || !CORP[corpKey]) return;
+  const corp = CORP[corpKey];
+  const prev = CORP[group.corpKey];
+  const wasDefault = prev && String(group.intro || '').trim() === String(prev.hiringIntro || prev.intro || '').trim();
+  group.corpKey = corpKey;
+  if (wasDefault || !String(group.intro || '').trim()) {
+    group.intro = corp.hiringIntro || corp.intro || '';
+  }
+  refreshHiringGroupsEditor();
+}
+
+function updateHiringIntro(gi, val) {
+  const group = S.hiringGroups[gi];
+  if (!group) return;
+  group.intro = val;
   renderPreview();
   scheduleAutoSave();
 }
 
-function updateDept(i, field, val) {
-  if (S.departments[i]) {
-    S.departments[i][field] = val;
-    renderPreview();
-    scheduleAutoSave();
-  }
+function addDept(gi) {
+  const group = S.hiringGroups[gi];
+  if (!group) return;
+  if (!Array.isArray(group.departments)) group.departments = [];
+  group.departments.push(makeDeptRowData());
+  refreshHiringGroupsEditor();
+}
+
+function removeDept(gi, di) {
+  const group = S.hiringGroups[gi];
+  if (!group || !Array.isArray(group.departments)) return;
+  group.departments.splice(di, 1);
+  refreshHiringGroupsEditor();
+}
+
+function updateDept(gi, di, field, val) {
+  const group = S.hiringGroups[gi];
+  if (!group || !group.departments || !group.departments[di]) return;
+  group.departments[di][field] = val;
+  renderPreview();
+  scheduleAutoSave();
 }
 
 // ─── STEP 4 HTML ───
 function buildStep4() {
   const corp = resolveCorp();
   const safe = htmlEsc;
+  const univSubOn = S.includeUnivSub !== false;
   return `
 <div class="space-y-6">
   <div>
@@ -1221,8 +1493,21 @@ function buildStep4() {
       <div class="flex gap-3"><span class="font-semibold text-gray-400 w-20 flex-shrink-0">Badge</span><span class="text-gray-700">${S.badge ? safe(S.badge) : '<span style="color:#d1d5db">미입력</span>'}</span></div>
       <div class="flex gap-3"><span class="font-semibold text-gray-400 w-20 flex-shrink-0">메인카피</span><span class="text-gray-700 whitespace-pre-wrap">${S.mainCopy ? safe(S.mainCopy) : '<span style="color:#d1d5db">미입력</span>'}</span></div>
       <div class="flex gap-3"><span class="font-semibold text-gray-400 w-20 flex-shrink-0">지원기간</span><span class="text-gray-700">${S.period ? safe(S.period) : '<span style="color:#d1d5db">미입력</span>'}</span></div>
-      <div class="flex gap-3"><span class="font-semibold text-gray-400 w-20 flex-shrink-0">모집부문</span><span class="text-gray-700">${S.departments.length}개</span></div>
+      <div class="flex gap-3"><span class="font-semibold text-gray-400 w-20 flex-shrink-0">모집부문</span><span class="text-gray-700">${countHiringDepartments()}개 직무 / ${S.hiringGroups.length}개 법인</span></div>
     </div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">추출 옵션</h2>
+    <label class="flex items-start gap-3 cursor-pointer select-none">
+      <input id="f-univ-sub" type="checkbox" class="mt-1 w-4 h-4 accent-blue-600"
+        ${univSubOn ? 'checked' : ''}
+        onchange="toggleUnivSub(this.checked)" />
+      <span class="min-w-0">
+        <span class="block text-sm font-bold text-gray-800">unives-sub 영역 포함</span>
+        <span class="block text-xs text-gray-400 mt-0.5 leading-relaxed">회사 원칙·일하는 방식 섹션을 미리보기와 다운로드 이미지에 포함합니다.</span>
+      </span>
+    </label>
   </div>
 
   <div class="rounded-xl border p-5" style="background:#eff6ff;border-color:#bfdbfe;">
@@ -1231,6 +1516,7 @@ function buildStep4() {
       <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>우측 미리보기에서 전체 내용을 확인했나요?</li>
       <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>오탈자 및 날짜 정보가 정확한가요?</li>
       <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>법인명이 맞게 설정되었나요?</li>
+      <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>unives-sub 포함 여부가 의도한 대로인가요?</li>
     </ul>
   </div>
 
@@ -1243,24 +1529,16 @@ function buildStep4() {
 </div>`;
 }
 
+function toggleUnivSub(on) {
+  S.includeUnivSub = !!on;
+  renderPreview();
+  scheduleAutoSave();
+}
+
 // ─────────────────────────────────────────────────────────────
 // ★★★ renderPreview — 상태(S)를 읽어 미리보기 전체를 재구성 ★★★
 // Figma escareer (900px) → preview canvas 600px (scale 2/3)
 // ─────────────────────────────────────────────────────────────
-function deptChipClass(category) {
-  const c = String(category || '');
-  if (/인턴|체험/.test(c)) return 'is-intern';
-  if (/계약|전환/.test(c)) return 'is-contract';
-  return 'is-regular';
-}
-
-function deptChipLabel(category) {
-  const c = String(category || '');
-  if (/인턴|체험/.test(c)) return '체험형';
-  if (/계약|전환/.test(c)) return '전환형';
-  return '정규직';
-}
-
 function renderPreview() {
   const canvas = document.getElementById('preview-canvas');
   if (!canvas) return;
@@ -1326,16 +1604,15 @@ function renderPreview() {
 
   if (visibleTracks.length > 0) {
     const tracksHtml = visibleTracks.map(track => {
-      const def = PROC_TYPES[track.type] || PROC_TYPES.A;
+      const category = (track.category || '').trim() || '채용분류';
       const steps = track.steps.map(s => String(s).trim()).filter(Boolean);
-      const procItems = steps.map((p, i) =>
-        `${i > 0 ? '<span class="pv-proc-dots" aria-hidden="true"><i></i><i></i><i></i></span>' : ''}
-         <span class="pv-proc-item">${htmlEsc(p)}</span>`
+      const procItems = steps.map((p) =>
+        `<span class="pv-proc-item">${htmlEsc(p)}</span>`
       ).join('');
       return `<div class="pv-proc-track">
         <div class="pv-proc-head">
-          <p class="pv-proc-title">${htmlEsc(def.title)}</p>
-          <span class="pv-proc-chip ${def.chipClass}">${htmlEsc(def.chip)}</span>
+          <p class="pv-proc-title">${htmlEsc(category)}</p>
+          ${renderProcChipHtml(track.chip)}
         </div>
         <div class="pv-proc-list">${procItems}</div>
       </div>`;
@@ -1375,41 +1652,61 @@ function renderPreview() {
   const s03 = `<div class="pv-s03">${s03parts.join('')}</div>`;
 
   // ── 섹션 04: 모집부문 ──
+  const visibleGroups = (S.hiringGroups || []).filter(g =>
+    Array.isArray(g.departments) && g.departments.some(d =>
+      (d.category && d.category.trim()) || (d.title && d.title.trim()) || (d.tasks && d.tasks.trim())
+    )
+  );
+
   let s04;
-  if (S.departments.length > 0) {
-    const rows = S.departments.map(d => {
-      const chipCls = deptChipClass(d.category);
-      const chipLbl = deptChipLabel(d.category);
-      const titleMain = (d.title || '-').trim();
-      return `<tr>
-        <td style="width:18%;">
-          <div class="pv-dept-cat">${htmlEsc(d.category || '-')}</div>
-          <span class="pv-dept-chip ${chipCls}">${htmlEsc(chipLbl)}</span>
-        </td>
-        <td style="width:24%;">
-          <p class="pv-dept-title">${htmlEsc(titleMain)}</p>
-        </td>
-        <td>
-          <p class="pv-dept-tasks">${htmlEsc(d.tasks || '-')}</p>
-        </td>
-      </tr>`;
+  if (visibleGroups.length > 0) {
+    const blocks = visibleGroups.map(g => {
+      const hCorp = CORP[g.corpKey] || CORP.es;
+      const intro = (g.intro != null && String(g.intro).trim())
+        ? String(g.intro)
+        : (hCorp.hiringIntro || hCorp.intro || '');
+      const rows = (g.departments || []).map(d => {
+        const titleLines = String(d.title || '').split(/\n/).map(s => s.trim()).filter(Boolean);
+        const titleMain = titleLines[0] || '-';
+        const titleEng = titleLines[1] || '';
+        const team = String(d.team || '').trim();
+        const tasks = String(d.tasks || '')
+          .replace(/\r\n/g, '\n')
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean)
+          .join('\n') || '-';
+        return `<tr>
+          <td style="width:18%;"><div class="pv-dept-cat-cell"><div class="pv-dept-cat">${htmlEsc(d.category || '-')}</div>${renderDeptChipHtml(d.chip)}</div></td>
+          <td style="width:24%;"><div class="pv-dept-job"><p class="pv-dept-title">${htmlEsc(titleMain)}</p>${titleEng ? `<p class="pv-dept-eng">${htmlEsc(titleEng)}</p>` : ''}</div></td>
+          <td><div class="pv-dept-body"><p class="pv-dept-tasks">${htmlEsc(tasks)}</p>${team ? `<p class="pv-dept-team">${htmlEsc(team)}</p>` : ''}</div></td>
+        </tr>`;
+      }).join('');
+      return `<div class="pv-hire-block">
+        <div class="pv-hire-head">
+          ${corpLogoHtml(hCorp, 'pv-hire-logo')}
+          <p class="pv-hire-intro">${htmlEsc(intro)}</p>
+        </div>
+        <table class="pv-dept-table">
+          <thead><tr>
+            <th style="width:18%;">분류</th>
+            <th style="width:24%;">직무</th>
+            <th>주요업무 및 모집팀</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
     }).join('');
-    s04 = `<div class="pv-s04">
+
+    s04 = `<div class="pv-s04" id="preview-corp-table">
       <p class="pv-sec-label" style="color:${color};">모집부문</p>
-      <table class="pv-dept-table" id="preview-corp-table">
-        <thead><tr>
-          <th style="width:18%;">분류</th>
-          <th style="width:24%;">직무</th>
-          <th>주요업무</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
+      <div class="pv-hire-list">${blocks}</div>
+      <img class="pv-hire-banner" src="assets/banner-career-home.png" alt="더 자세한 사항은 채용 홈페이지의 채용 공고를 확인해주세요! univ.careerlink.kr" />
     </div>`;
   } else {
-    s04 = `<div class="pv-s04">
+    s04 = `<div class="pv-s04" id="preview-corp-table">
       <p class="pv-sec-label" style="color:${color};">모집부문</p>
-      <table class="pv-dept-table" id="preview-corp-table" style="display:none;"></table>
-      <p class="pv-empty">STEP 3에서 모집 부문을 추가해주세요</p>
+      <p class="pv-empty">STEP 3에서 채용 법인과 모집 부문을 추가해주세요</p>
     </div>`;
   }
 
@@ -1490,7 +1787,7 @@ function renderPreview() {
     <p class="pv-s05-note" id="preview-eco-note">대학내일ES는 (주)대학내일과 구성법인\nNHR, 51percent, OOB Co., 더포지티브, 위베러, 컨셉추얼을 포함한 그룹 명칭입니다.</p>
   </div>
 
-  <div class="pv-s05-intro" id="preview-introduce">
+  ${S.includeUnivSub !== false ? `<div class="pv-s05-intro" id="preview-introduce" data-figma="unives-sub">
     <div class="pv-s05-sec">
       <h3 class="pv-s05-h">행동의 기준이 되는 원칙</h3>
       <div class="pv-principle-row">
@@ -1537,7 +1834,9 @@ function renderPreview() {
         </div>
       </div>
     </div>
+  </div>` : ''}
 
+  <div class="pv-s05-welfare" id="preview-welfare">
     <div class="pv-s05-sec gap78">
       <h3 class="pv-s05-h">지속가능한 근무환경을 만들어갑니다</h3>
       <div class="pv-benefit-groups" id="preview-benefits">
@@ -1621,36 +1920,70 @@ async function downloadImage() {
   btn.disabled = true;
   btn.innerHTML = '⏳ &nbsp;이미지 캡처 중...';
 
-  await new Promise(r => setTimeout(r, 300));
-
   try {
+    // 이미지 로드 완료 대기 (미로드 시 캡처 실패/빈 이미지 방지)
+    const imgs = Array.from(canvas.querySelectorAll('img'));
+    await Promise.all(imgs.map(img => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+      return new Promise(resolve => {
+        const done = () => resolve();
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', done, { once: true });
+        // 캐시/중단 대비
+        setTimeout(done, 8000);
+      });
+    }));
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    const w = Math.ceil(canvas.scrollWidth || canvas.offsetWidth || 900);
+    const h = Math.ceil(canvas.scrollHeight || canvas.offsetHeight || 0);
+    if (!h) throw new Error('미리보기 높이를 계산할 수 없습니다.');
+
+    // allowTaint:true + toDataURL 조합은 SecurityError를 유발하므로 CORS만 사용
     const result = await html2canvas(canvas, {
       scale: 2,
       useCORS: true,
-      allowTaint: true,
+      allowTaint: false,
       backgroundColor: '#ffffff',
-      scrollX: 0, scrollY: 0,
-      width: canvas.scrollWidth,
-      height: canvas.scrollHeight,
-      windowWidth: canvas.scrollWidth,
-      windowHeight: canvas.scrollHeight,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      width: w,
+      height: h,
+      windowWidth: w,
+      windowHeight: h,
       logging: false,
-      imageTimeout: 15000
+      imageTimeout: 20000,
+      foreignObjectRendering: false
     });
 
     const corp = resolveCorp();
     const now  = new Date();
     const ds   = now.getFullYear() + pad2(now.getMonth()+1) + pad2(now.getDate());
-    const a    = document.createElement('a');
-    a.download = `채용공고_${corp.name}_${ds}.png`;
-    a.href     = result.toDataURL('image/png', 1.0);
-    a.click();
+    const filename = `recruit_${(corp.name || 'poster').replace(/[^\w가-힣+-]+/g, '_')}_${ds}.png`;
+
+    await new Promise((resolve, reject) => {
+      result.toBlob(blob => {
+        if (!blob) {
+          reject(new Error('PNG Blob 생성에 실패했습니다.'));
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.download = filename;
+        a.href = url;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        resolve();
+      }, 'image/png');
+    });
 
     btn.disabled = false;
     btn.innerHTML = '✅ &nbsp;다운로드 완료!';
     setTimeout(() => { btn.innerHTML = '📷 &nbsp;채용 공고 이미지 다운로드'; }, 3000);
   } catch (e) {
-    console.error(e);
+    console.error('[downloadImage]', e);
     btn.disabled = false;
     btn.innerHTML = '❌ &nbsp;오류 발생 - 다시 시도해주세요';
     setTimeout(() => { btn.innerHTML = '📷 &nbsp;채용 공고 이미지 다운로드'; }, 3000);
