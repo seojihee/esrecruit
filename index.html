@@ -1920,7 +1920,7 @@ function buildDeptRow(d, gi, di) {
   return `
   <div class="dept-row-card" id="dr-${gi}-${di}">
     <div class="dept-row-top">
-      <input type="text" placeholder="분류 (예: 신입, 계약직, 인턴)" value="${safe(d.category||'')}"
+      <input type="text" placeholder="채용분류 (예: 신입,인턴,경력)" value="${safe(d.category||'')}"
         class="f-input" style="font-size:12px;padding:7px 8px;"
         oninput="updateDept(${gi},${di},'category',this.value)" />
       <select class="f-input" style="font-size:12px;padding:7px 8px;"
