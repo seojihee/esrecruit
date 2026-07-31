@@ -89,6 +89,22 @@
     .char-cnt { font-size: 11px; color: #94a3b8; text-align: right; margin-top: 3px; }
     .char-cnt.over { color: #ef4444; }
 
+    /* ── Period picker (STEP 2) ── */
+    .period-picker { display: flex; flex-direction: column; gap: 10px; }
+    .period-row {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    }
+    .period-row-label {
+      width: 32px; flex-shrink: 0; font-size: 12px; font-weight: 600; color: #64748b;
+    }
+    .period-row .f-input {
+      width: auto; padding: 8px 8px; font-size: 13px;
+    }
+    .period-sel-year { min-width: 84px; }
+    .period-sel-num { min-width: 64px; }
+    .period-unit { font-size: 12px; color: #64748b; flex-shrink: 0; }
+    .period-tilde { font-size: 13px; color: #94a3b8; margin: 0 2px; }
+
     /* ── Tip box ── */
     .tip-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 16px; }
 
@@ -479,7 +495,8 @@
     }
 
     .pv-s05-intro {
-      width: 900px; background: #f7f8fa; padding: 90px 60px;
+      width: 900px; background: #f7f8fa; padding: 80px 60px 90px;
+      margin-top: 50px;
       display: flex; flex-direction: column; gap: 135px;
     }
     .pv-s05-welfare {
@@ -639,6 +656,9 @@
         </svg>
         임시저장됨 -
       </span>
+      <button type="button" onclick="doReset()" class="px-3.5 py-1.5 text-xs font-bold text-gray-500 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors">
+        초기화
+      </button>
       <button onclick="doSave()" class="px-3.5 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-200 transition-colors">
         임시저장
       </button>
@@ -853,6 +873,170 @@ const PROC_CHIPS = {
 };
 const PROC_CHIP_ORDER = ['regular', 'contract', 'convert', 'experience', 'contractConvert'];
 const PROC_DEFAULT_STEPS = ['서류 접수', '면접 전형', '최종 합격'];
+const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+
+function createDefaultPeriodParts() {
+  return {
+    startYear: '',
+    startMonth: '',
+    startDay: '',
+    endMonth: '',
+    endDay: '',
+    endHour: '',
+    endMinute: ''
+  };
+}
+
+function normalizePeriodParts(raw) {
+  const d = createDefaultPeriodParts();
+  if (!raw || typeof raw !== 'object') return d;
+  Object.keys(d).forEach(k => {
+    const v = raw[k];
+    d[k] = v == null || v === '' ? '' : String(v);
+  });
+  return d;
+}
+
+function daysInMonth(year, month) {
+  const y = Number(year);
+  const m = Number(month);
+  if (!y || !m) return 31;
+  return new Date(y, m, 0).getDate();
+}
+
+function weekdayKo(year, month, day) {
+  const d = new Date(Number(year), Number(month) - 1, Number(day));
+  if (Number.isNaN(d.getTime())) return '';
+  return WEEKDAY_KO[d.getDay()];
+}
+
+function formatPeriodParts(parts) {
+  const p = parts || createDefaultPeriodParts();
+  const sy = Number(p.startYear);
+  const sm = Number(p.startMonth);
+  const sd = Number(p.startDay);
+  const em = Number(p.endMonth);
+  const ed = Number(p.endDay);
+  const eh = p.endHour === '' ? NaN : Number(p.endHour);
+  const emin = p.endMinute === '' ? NaN : Number(p.endMinute);
+  if (![sy, sm, sd, em, ed, eh, emin].every(n => Number.isFinite(n) && n >= 0)) return '';
+  if (sy < 1000 || sy > 9999) return '';
+  if (sm < 1 || sm > 12 || em < 1 || em > 12) return '';
+  if (sd < 1 || sd > daysInMonth(sy, sm) || ed < 1 || ed > daysInMonth(sy, em)) return '';
+  if (eh > 23 || emin > 59) return '';
+  const sw = weekdayKo(sy, sm, sd);
+  const ew = weekdayKo(sy, em, ed);
+  return `${sy}년 ${sm}월 ${sd}일(${sw}) ~ ${em}월 ${ed}일(${ew}) ${pad2(eh)}:${pad2(emin)}`;
+}
+
+function syncPeriodFromParts() {
+  S.periodParts = normalizePeriodParts(S.periodParts);
+  S.period = formatPeriodParts(S.periodParts);
+}
+
+function parsePeriodString(str) {
+  const s = String(str || '').trim();
+  if (!s) return null;
+  const m = s.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일.*?~\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일.*?(\d{1,2})\s*:\s*(\d{1,2})/);
+  if (!m) return null;
+  return {
+    startYear: String(Number(m[1])),
+    startMonth: String(Number(m[2])),
+    startDay: String(Number(m[3])),
+    endMonth: String(Number(m[4])),
+    endDay: String(Number(m[5])),
+    endHour: String(Number(m[6])),
+    endMinute: String(Number(m[7]))
+  };
+}
+
+function buildNumOptions(from, to, selected, pad) {
+  let html = `<option value="">-</option>`;
+  for (let n = from; n <= to; n++) {
+    const val = String(n);
+    const label = pad ? pad2(n) : val;
+    html += `<option value="${val}" ${String(selected) === val ? 'selected' : ''}>${label}</option>`;
+  }
+  return html;
+}
+
+function buildMinuteOptions(selected) {
+  let html = `<option value="">-</option>`;
+  for (let n = 0; n < 60; n += 30) {
+    const val = String(n);
+    html += `<option value="${val}" ${String(selected) === val ? 'selected' : ''}>${pad2(n)}</option>`;
+  }
+  // 구버전에서 파싱된 비30분 단위 값도 표시 유지
+  if (selected !== '' && selected != null && Number(selected) % 30 !== 0) {
+    const n = Number(selected);
+    if (Number.isFinite(n) && n >= 0 && n <= 59) {
+      html += `<option value="${n}" selected>${pad2(n)}</option>`;
+    }
+  }
+  return html;
+}
+
+function buildPeriodPickerHtml() {
+  const p = normalizePeriodParts(S.periodParts);
+  const yearFallback = new Date().getFullYear();
+  const startDays = daysInMonth(p.startYear || yearFallback, p.startMonth || 1);
+  const endDays = daysInMonth(p.startYear || yearFallback, p.endMonth || 1);
+  return `
+  <div class="period-picker" id="period-picker">
+    <div class="period-row">
+      <span class="period-row-label">시작</span>
+      <input type="text" class="f-input period-sel-year" id="f-period-start-year"
+        inputmode="numeric" maxlength="4" placeholder="2026"
+        value="${htmlEsc(p.startYear)}"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4);updatePeriodPart('startYear',this.value)"
+        aria-label="시작 연도" />
+      <span class="period-unit">년</span>
+      <select class="f-input period-sel-num" data-period="startMonth" onchange="updatePeriodPart('startMonth', this.value)" aria-label="시작 월">${buildNumOptions(1, 12, p.startMonth, false)}</select>
+      <span class="period-unit">월</span>
+      <select class="f-input period-sel-num" id="f-period-start-day" data-period="startDay" onchange="updatePeriodPart('startDay', this.value)" aria-label="시작 일">${buildNumOptions(1, startDays, p.startDay, false)}</select>
+      <span class="period-unit">일</span>
+    </div>
+    <div class="period-row">
+      <span class="period-row-label">마감</span>
+      <select class="f-input period-sel-num" data-period="endMonth" onchange="updatePeriodPart('endMonth', this.value)" aria-label="마감 월">${buildNumOptions(1, 12, p.endMonth, false)}</select>
+      <span class="period-unit">월</span>
+      <select class="f-input period-sel-num" id="f-period-end-day" data-period="endDay" onchange="updatePeriodPart('endDay', this.value)" aria-label="마감 일">${buildNumOptions(1, endDays, p.endDay, false)}</select>
+      <span class="period-unit">일</span>
+      <span class="period-tilde">·</span>
+      <select class="f-input period-sel-num" data-period="endHour" onchange="updatePeriodPart('endHour', this.value)" aria-label="마감 시">${buildNumOptions(0, 23, p.endHour, true)}</select>
+      <span class="period-unit">:</span>
+      <select class="f-input period-sel-num" data-period="endMinute" onchange="updatePeriodPart('endMinute', this.value)" aria-label="마감 분">${buildMinuteOptions(p.endMinute)}</select>
+    </div>
+  </div>`;
+}
+
+function updatePeriodPart(key, value) {
+  S.periodParts = normalizePeriodParts(S.periodParts);
+  S.periodParts[key] = value == null ? '' : String(value);
+
+  // 월/연 변경 시 일자 상한 보정
+  if (key === 'startYear' || key === 'startMonth') {
+    const max = daysInMonth(S.periodParts.startYear, S.periodParts.startMonth);
+    if (S.periodParts.startDay && Number(S.periodParts.startDay) > max) S.periodParts.startDay = String(max);
+    refreshPeriodDaySelect('f-period-start-day', 'startDay', max);
+  }
+  if (key === 'startYear' || key === 'endMonth') {
+    const max = daysInMonth(S.periodParts.startYear, S.periodParts.endMonth);
+    if (S.periodParts.endDay && Number(S.periodParts.endDay) > max) S.periodParts.endDay = String(max);
+    refreshPeriodDaySelect('f-period-end-day', 'endDay', max);
+  }
+
+  syncPeriodFromParts();
+  renderPreview();
+  scheduleAutoSave();
+}
+
+function refreshPeriodDaySelect(id, partKey, maxDays) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const selected = S.periodParts[partKey] || '';
+  el.innerHTML = buildNumOptions(1, maxDays, selected, false);
+}
 
 // 구버전 typeA–E → 새 모델 매핑
 const LEGACY_PROC_TYPE = {
@@ -983,27 +1167,32 @@ function corpLogoHtml(corp, className) {
 // ─────────────────────────────────────────────────────────────
 // STATE — 이 객체가 모든 데이터의 단일 진실 원천(Single Source of Truth)
 // ─────────────────────────────────────────────────────────────
-let S = {
-  currentStep : 1,
-  template    : 'recruit',
-  corp        : 'es',
-  // STEP 1
-  badge    : '',
-  mainCopy : '',
-  subCopy  : '',
-  bannerHeading: '', // 회색 배너 제목 (기본: 법인 heading)
-  bannerIntro  : '', // 회색 배너 본문 (기본: 법인 intro)
-  // STEP 2
-  period      : '',
-  procTracks  : [], // [{category:'신입', chip:'regular', steps:['서류 접수',...]}]
-  docDeadline : '',
-  interviewDate: '',
-  announceDate : '',
-  // STEP 3
-  hiringGroups: [], // [{corpKey, intro, departments:[{category,chip,title,tasks,team}]}]
-  // STEP 4
-  includeUnivSub: true // Figma unives-sub (원칙 / 일하는 방식)
-};
+function createDefaultState() {
+  return {
+    currentStep : 1,
+    template    : 'recruit',
+    corp        : 'es',
+    // STEP 1
+    badge    : '',
+    mainCopy : '',
+    subCopy  : '',
+    bannerHeading: '', // 회색 배너 제목 (기본: 법인 heading)
+    bannerIntro  : '', // 회색 배너 본문 (기본: 법인 intro)
+    // STEP 2
+    period      : '',
+    periodParts : createDefaultPeriodParts(),
+    procTracks  : [], // [{category:'신입', chip:'regular', steps:['서류 접수',...]}]
+    docDeadline : '',
+    interviewDate: '',
+    announceDate : '',
+    // STEP 3
+    hiringGroups: [], // [{corpKey, intro, departments:[{category,chip,title,tasks,team}]}]
+    // STEP 4
+    includeUnivSub: true // Figma unives-sub (원칙 / 일하는 방식)
+  };
+}
+
+let S = createDefaultState();
 
 // ─────────────────────────────────────────────────────────────
 // LOCAL STORAGE
@@ -1017,6 +1206,21 @@ function doSave() {
     el.innerHTML = `<svg class="w-3.5 h-3.5" style="color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 임시저장됨 ${t}`;
     el.style.color = '#16a34a';
     setTimeout(() => { el.style.color = ''; }, 3000);
+  }
+}
+
+function doReset() {
+  if (!confirm('작성한 내용을 모두 기본 설정으로 초기화할까요?\n임시저장된 내용도 함께 삭제됩니다.')) return;
+  clearTimeout(_saveTimer);
+  S = createDefaultState();
+  ensureBannerCopy();
+  localStorage.removeItem(STORAGE_KEY);
+  setPreviewScrollTarget(previewTargetForStep(1), false);
+  renderAll();
+  const el = document.getElementById('save-label');
+  if (el) {
+    el.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> 초기화됨`;
+    el.style.color = '';
   }
 }
 
@@ -1056,6 +1260,19 @@ function loadSaved() {
     S.hiringGroups = normalizeHiringGroups(parsed.hiringGroups || S.hiringGroups, parsed.departments, S.corp);
     delete S.departments;
     if (typeof S.includeUnivSub !== 'boolean') S.includeUnivSub = true;
+    // 지원 기간: 구조화 필드 정규화 + 구버전 문자열 파싱
+    S.periodParts = normalizePeriodParts(S.periodParts);
+    let hasPeriodParts = Object.values(S.periodParts).some(v => v !== '');
+    if (!hasPeriodParts && S.period) {
+      const parsedPeriod = parsePeriodString(S.period);
+      if (parsedPeriod) {
+        S.periodParts = parsedPeriod;
+        hasPeriodParts = true;
+      }
+    }
+    syncPeriodFromParts();
+    // 드롭다운으로 복원하지 못한 구버전 자유입력 문자열은 유지
+    if (!S.period && !hasPeriodParts && parsed.period) S.period = String(parsed.period);
     ensureBannerCopy();
     return true;
   } catch(e) { return false; }
@@ -1095,6 +1312,7 @@ function goToStep(n) {
   collectCurrentStep();
   const max = getMaxStep();
   S.currentStep = Math.max(1, Math.min(max, n));
+  setPreviewScrollTarget(previewTargetForStep(S.currentStep), true);
   renderAll();
 }
 function nextStep() {
@@ -1143,11 +1361,10 @@ function collectCurrentStep() {
     if (bh) S.bannerHeading = bh.value;
     if (bi) S.bannerIntro   = bi.value;
   } else if (step === 2) {
-    const p   = document.getElementById('f-period');
+    syncPeriodFromParts();
     const doc = document.getElementById('f-doc');
     const inv = document.getElementById('f-interview');
     const ann = document.getElementById('f-announce');
-    if (p)   S.period       = p.value;
     if (doc) S.docDeadline  = doc.value;
     if (inv) S.interviewDate= inv.value;
     if (ann) S.announceDate = ann.value;
@@ -1162,6 +1379,7 @@ function onTemplateChange(val) {
   collectCurrentStep();
   S.template = TEMPLATES[val] ? val : 'recruit';
   S.currentStep = 1;
+  setPreviewScrollTarget(previewTargetForStep(1), true);
   renderAll();
   scheduleAutoSave();
 }
@@ -1233,7 +1451,6 @@ function attachFormListeners() {
     updateCnt('f-sub-copy','cnt-sub',30);
   }
   if (step === 2) {
-    bindInput('f-period',    v => { S.period        = v; });
     bindInput('f-doc',       v => { S.docDeadline   = v; });
     bindInput('f-interview', v => { S.interviewDate = v; });
     bindInput('f-announce',  v => { S.announceDate  = v; });
@@ -1271,14 +1488,14 @@ function buildStep1() {
     <p class="text-sm text-gray-400">채용의 핵심 메시지를 입력하면 메인 비주얼이 자동 생성됩니다.</p>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target="#preview-s01">
     <label class="block text-xs font-bold text-gray-600 mb-1.5" for="f-badge">상단 Badge</label>
     <input id="f-badge" type="text" maxlength="25" value="${safe(S.badge)}"
       placeholder="예: 2026 상반기 상시 채용" class="f-input" />
     <div class="char-cnt" id="cnt-badge">0/20</div>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target="#preview-s01">
     <label class="block text-xs font-bold text-gray-600 mb-1.5" for="f-main-copy">메인 카피</label>
     <textarea id="f-main-copy" maxlength="70" rows="4"
       placeholder="예: 스스로 일을 정의하고&#10;경계 없이 문제를 풀어나갈&#10;동료를 찾습니다."
@@ -1286,7 +1503,7 @@ function buildStep1() {
     <div class="char-cnt" id="cnt-main">0/60</div>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target="#preview-s01">
     <label class="block text-xs font-bold text-gray-600 mb-1.5" for="f-sub-copy">
       서브카피 <span class="font-normal text-gray-400">(채용 직무 및 일정)</span>
     </label>
@@ -1295,7 +1512,7 @@ function buildStep1() {
     <div class="char-cnt" id="cnt-sub">0/30</div>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm space-y-4">
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm space-y-4" data-preview-target="#preview-s02">
     <div>
       <label class="block text-xs font-bold text-gray-600 mb-1.5" for="f-banner-heading">
         배너 제목 <span class="font-normal text-gray-400">(회색 영역)</span>
@@ -1341,14 +1558,14 @@ function buildStep1Story() {
     <p class="text-sm text-gray-400">인스타그램 스토리(1080×1920)에 들어갈 문구를 입력하세요.</p>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target=".pv-ig-story">
     <label class="block text-xs font-bold text-gray-600 mb-1.5" for="f-badge">상단 Badge</label>
     <input id="f-badge" type="text" maxlength="25" value="${safe(S.badge)}"
       placeholder="예: 2026 상반기 정규직 채용" class="f-input" />
     <div class="char-cnt" id="cnt-badge">0/20</div>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target=".pv-ig-story">
     <label class="block text-xs font-bold text-gray-600 mb-1.5" for="f-main-copy">메인 카피</label>
     <textarea id="f-main-copy" maxlength="70" rows="4"
       placeholder="예: 스스로 일을 정의하고&#10;경계 없이 문제를 풀어나갈&#10;동료를 찾습니다."
@@ -1356,7 +1573,7 @@ function buildStep1Story() {
     <div class="char-cnt" id="cnt-main">0/60</div>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target=".pv-ig-story">
     <label class="block text-xs font-bold text-gray-600 mb-1.5" for="f-sub-copy">
       서브카피 <span class="font-normal text-gray-400">(채용 직무 및 일정)</span>
     </label>
@@ -1420,13 +1637,13 @@ function buildStep2() {
     <p class="text-sm text-gray-400">지원 기간과 전형 절차, 일정을 입력해 주세요.</p>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-    <label class="block text-xs font-bold text-gray-600 mb-1.5" for="f-period">지원 기간</label>
-    <input id="f-period" type="text" value="${safe(S.period)}"
-      placeholder="예: 2026년 3월 6일(금) ~ 3월 16일(월) 15:00" class="f-input" />
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target="#preview-period-block">
+    <label class="block text-xs font-bold text-gray-600 mb-1.5">지원 기간</label>
+    <p class="text-xs text-gray-400 mb-2">시작 연도는 직접 입력하고, 월·일·시각은 드롭다운으로 선택하세요.</p>
+    ${buildPeriodPickerHtml()}
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target="#preview-proc-block">
     <div class="flex items-start justify-between gap-3 mb-3">
       <div>
         <label class="block text-xs font-bold text-gray-600 mb-0.5">전형 절차</label>
@@ -1440,7 +1657,7 @@ function buildStep2() {
     </button>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target="#preview-sched-block">
     <label class="block text-xs font-bold text-gray-600 mb-3">전형 일정 상세</label>
     <div class="space-y-3">
       <div>
@@ -1497,7 +1714,7 @@ function buildProcTracksEditor() {
       <div class="flex items-center gap-2 mb-2">
         <input type="text" class="f-input" style="flex:1.2;min-width:0;"
           value="${htmlEsc(track.category || '')}"
-          placeholder="채용분류 (예: 신입, 계약직, 인턴)"
+          placeholder="채용분류 (예: 신입,인턴,경력)"
           oninput="updateProcCategory(${ti},this.value)" />
         <select class="f-input" style="flex:1;min-width:120px;" onchange="changeProcChip(${ti},this.value)"
           title="계약형태 칩">
@@ -1639,7 +1856,7 @@ function buildStep3() {
     <p class="text-sm text-gray-400">채용 법인을 선택한 뒤, 직무 정보를 입력해 주세요.</p>
   </div>
 
-  <div id="hire-groups">${buildHiringGroupsEditor()}</div>
+  <div id="hire-groups" data-preview-target="#preview-corp-table">${buildHiringGroupsEditor()}</div>
 
   <button type="button" onclick="addHiringGroup()"
     class="btn-dashed w-full py-3 border-2 border-dashed rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
@@ -1814,7 +2031,7 @@ function buildStep4() {
     </div>
   </div>
 
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5" data-preview-target="#preview-introduce">
     <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">추출 옵션</h2>
     <label class="flex items-start gap-3 cursor-pointer select-none">
       <input id="f-univ-sub" type="checkbox" class="mt-1 w-4 h-4"
@@ -1822,7 +2039,7 @@ function buildStep4() {
         ${univSubOn ? 'checked' : ''}
         onchange="toggleUnivSub(this.checked)" />
       <span class="min-w-0">
-        <span class="block text-sm font-bold text-gray-800">unives-sub 영역 포함</span>
+        <span class="block text-sm font-bold text-gray-800">대학내일ES MVC2.0 포함</span>
         <span class="block text-xs text-gray-400 mt-0.5 leading-relaxed">회사 원칙·일하는 방식 섹션을 미리보기와 다운로드 이미지에 포함합니다.</span>
       </span>
     </label>
@@ -1834,7 +2051,7 @@ function buildStep4() {
       <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>우측 미리보기에서 전체 내용을 확인했나요?</li>
       <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>오탈자 및 날짜 정보가 정확한가요?</li>
       <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>법인명이 맞게 설정되었나요?</li>
-      <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>unives-sub 포함 여부가 의도한 대로인가요?</li>
+      <li class="flex items-center gap-2"><span style="width:16px;height:16px;border-radius:50%;border:2px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">✓</span>대학내일ES MVC2.0 포함 여부가 의도한 대로인가요?</li>
     </ul>
   </div>
 
@@ -1849,6 +2066,7 @@ function buildStep4() {
 
 function toggleUnivSub(on) {
   S.includeUnivSub = !!on;
+  setPreviewScrollTarget(on ? '#preview-introduce' : '#preview-section05', true);
   renderPreview();
   scheduleAutoSave();
 }
@@ -1883,6 +2101,7 @@ function renderPreview() {
   if (isStoryTemplate()) {
     canvas.classList.add('is-story');
     canvas.innerHTML = buildStoryPreviewHtml();
+    schedulePreviewScroll(false);
     return;
   }
   canvas.classList.remove('is-story');
@@ -1903,7 +2122,7 @@ function renderPreview() {
         : `<div class="pv-corp-badge" id="preview-corp-name">${htmlEsc(corp.name)}</div>`);
 
   const s01 = `
-<div class="pv-s01${subCopyText ? ' has-sub' : ''}" style="background:${color};" data-corp="${htmlEsc(S.corp)}">
+<div class="pv-s01${subCopyText ? ' has-sub' : ''}" id="preview-s01" style="background:${color};" data-corp="${htmlEsc(S.corp)}">
   <img class="pv-s01-bg" id="preview-main-bg" src="${bgSrc}" alt="" />
   <div class="pv-s01-wash" style="background:${color}; opacity:${corp.logoInBg ? '0.06' : '0.12'};"></div>
   <div class="pv-s01-inner">
@@ -1923,7 +2142,7 @@ function renderPreview() {
   const bannerHeading = S.bannerHeading || corp.heading || '';
   const bannerIntro = S.bannerIntro || corp.intro || '';
   const s02 = `
-<div class="pv-s02">
+<div class="pv-s02" id="preview-s02">
   <h2 class="pv-heading" id="preview-heading">${htmlEsc(bannerHeading)}</h2>
   <p class="pv-body" id="preview-intro">${htmlEsc(bannerIntro)}</p>
 </div>`;
@@ -1931,7 +2150,7 @@ function renderPreview() {
   // ── 섹션 03: 모집요강 ──
   let s03parts = [];
 
-  s03parts.push(`<div class="pv-info-block">
+  s03parts.push(`<div class="pv-info-block" id="preview-period-block">
     <p class="pv-sec-label" style="color:${color};">지원기간</p>
     <p class="pv-info-val" id="preview-period">${htmlEsc(S.period) || '지원기간을 입력해주세요'}</p>
   </div>`);
@@ -1964,13 +2183,13 @@ function renderPreview() {
         <div class="pv-proc-list">${procItems}</div>
       </div>`;
     }).join('');
-    s03parts.push(`<div class="pv-info-block">
+    s03parts.push(`<div class="pv-info-block" id="preview-proc-block">
       <p class="pv-sec-label" style="color:${color};">전형절차</p>
       <div class="pv-proc-tracks" id="preview-procedures">${tracksHtml}</div>
       <p class="pv-note">※면접 대상자에 대하여 사전/현장 과제를 포함한 추가 전형이 진행될 수 있습니다.</p>
     </div>`);
   } else {
-    s03parts.push(`<div class="pv-info-block">
+    s03parts.push(`<div class="pv-info-block" id="preview-proc-block">
       <p class="pv-sec-label" style="color:${color};">전형절차</p>
       <div class="pv-proc-tracks" id="preview-procedures"><p class="pv-empty" style="padding:8px 0;text-align:left;">전형 절차를 입력해주세요</p></div>
     </div>`);
@@ -1989,14 +2208,19 @@ function renderPreview() {
         <div class="pv-sched-val">${htmlEsc(r.v)}</div>
       </div>`
     ).join('');
-    s03parts.push(`<div class="pv-info-block">
+    s03parts.push(`<div class="pv-info-block" id="preview-sched-block">
       <p class="pv-sec-label" style="color:${color};">전형일정</p>
       <div class="pv-sched-list" id="preview-schedule">${rows}</div>
       <p class="pv-note">※상세 일정은 각 공고를 참고해주시기 바라며, 상기 일정은 채용 상황에 따라 변동될 수 있습니다.<br/>※공고에 따라 서류 접수 마감일과 면접 진행 일정이 상이할 수 있습니다.</p>
     </div>`);
+  } else {
+    s03parts.push(`<div class="pv-info-block" id="preview-sched-block">
+      <p class="pv-sec-label" style="color:${color};">전형일정</p>
+      <div class="pv-sched-list" id="preview-schedule"><p class="pv-empty" style="padding:8px 0;text-align:left;">전형 일정을 입력해주세요</p></div>
+    </div>`);
   }
 
-  const s03 = `<div class="pv-s03">${s03parts.join('')}</div>`;
+  const s03 = `<div class="pv-s03" id="preview-s03">${s03parts.join('')}</div>`;
 
   // ── 섹션 04: 모집부문 ──
   const visibleGroups = (S.hiringGroups || []).filter(g =>
@@ -2226,6 +2450,101 @@ function renderPreview() {
 </div>`;
 
   canvas.innerHTML = s01 + s02 + s03 + s04 + s05;
+  schedulePreviewScroll(false);
+}
+
+// ─────────────────────────────────────────────────────────────
+// PREVIEW SCROLL SYNC — 폼 작성 중 해당 미리보기 영역으로 이동
+// ─────────────────────────────────────────────────────────────
+let _previewScrollTarget = null;
+let _previewScrollTimer = null;
+let _previewScrollSmooth = false;
+
+function previewTargetForStep(step) {
+  if (isStoryTemplate()) return '.pv-ig-story';
+  switch (step) {
+    case 1: return '#preview-s01';
+    case 2: return '#preview-s03';
+    case 3: return '#preview-corp-table';
+    case 4: return '#preview-section05';
+    default: return '#preview-s01';
+  }
+}
+
+function resolvePreviewTargetFromEl(el) {
+  if (!el || !el.closest) return previewTargetForStep(S.currentStep);
+  const tagged = el.closest('[data-preview-target]');
+  if (tagged && tagged.getAttribute('data-preview-target')) {
+    let target = tagged.getAttribute('data-preview-target');
+    if (target === '#preview-introduce' && S.includeUnivSub === false) {
+      target = '#preview-section05';
+    }
+    return target;
+  }
+  const id = el.id || '';
+  if (isStoryTemplate()) return '.pv-ig-story';
+  if (id === 'f-badge' || id === 'f-main-copy' || id === 'f-sub-copy') return '#preview-s01';
+  if (id === 'f-banner-heading' || id === 'f-banner-intro') return '#preview-s02';
+  if (el.closest('#period-picker') || id.indexOf('f-period') === 0) return '#preview-period-block';
+  if (el.closest('#proc-tracks') || el.closest('.proc-track-card')) return '#preview-proc-block';
+  if (id === 'f-doc' || id === 'f-interview' || id === 'f-announce') return '#preview-sched-block';
+  if (el.closest('#hire-groups') || el.closest('.hire-group-card') || el.closest('.dept-row-card')) {
+    return '#preview-corp-table';
+  }
+  if (id === 'f-univ-sub') {
+    return S.includeUnivSub !== false ? '#preview-introduce' : '#preview-section05';
+  }
+  return previewTargetForStep(S.currentStep);
+}
+
+function setPreviewScrollTarget(selector, smooth) {
+  if (!selector) return;
+  _previewScrollTarget = selector;
+  _previewScrollSmooth = smooth !== false;
+  schedulePreviewScroll(_previewScrollSmooth);
+}
+
+function schedulePreviewScroll(smooth) {
+  if (typeof smooth === 'boolean') _previewScrollSmooth = smooth;
+  clearTimeout(_previewScrollTimer);
+  _previewScrollTimer = setTimeout(() => {
+    requestAnimationFrame(() => scrollPreviewToTarget());
+  }, 40);
+}
+
+function scrollPreviewToTarget() {
+  const wrap = document.getElementById('preview-wrap');
+  if (!wrap || !_previewScrollTarget) return;
+  let el = wrap.querySelector(_previewScrollTarget);
+  if (!el && _previewScrollTarget === '#preview-introduce') {
+    el = wrap.querySelector('#preview-section05');
+  }
+  if (!el) return;
+
+  const wrapRect = wrap.getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+  const topPad = 24;
+  const nextTop = Math.max(0, elRect.top - wrapRect.top + wrap.scrollTop - topPad);
+  const delta = Math.abs(nextTop - wrap.scrollTop);
+  if (delta < 8) {
+    _previewScrollSmooth = false;
+    return;
+  }
+  wrap.scrollTo({
+    top: nextTop,
+    behavior: _previewScrollSmooth ? 'smooth' : 'auto'
+  });
+  _previewScrollSmooth = false;
+}
+
+function attachPreviewScrollSync() {
+  const form = document.getElementById('center-form');
+  if (!form || form.dataset.previewScrollBound === '1') return;
+  form.dataset.previewScrollBound = '1';
+  form.addEventListener('focusin', (e) => {
+    const target = resolvePreviewTargetFromEl(e.target);
+    if (target) setPreviewScrollTarget(target, true);
+  });
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -2356,6 +2675,9 @@ function renderAll() {
   renderCenterForm();
   renderPreview();
   syncSidebar();
+  if (!_previewScrollTarget) {
+    setPreviewScrollTarget(previewTargetForStep(S.currentStep), false);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -2364,6 +2686,8 @@ function renderAll() {
 document.addEventListener('DOMContentLoaded', () => {
   const loaded = loadSaved();
   ensureBannerCopy();
+  attachPreviewScrollSync();
+  setPreviewScrollTarget(previewTargetForStep(S.currentStep), false);
   renderAll();
   if (loaded) {
     const el = document.getElementById('save-label');
