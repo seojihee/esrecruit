@@ -228,9 +228,10 @@
     }
     .pv-badge {
       display: flex; align-items: center; justify-content: center;
-      min-width: 326px; height: 72px; padding: 17px 30px; border-radius: 90px;
+      box-sizing: border-box;
+      min-width: 326px; height: 72px; padding: 0 30px; border-radius: 90px;
       background: rgba(255,255,255,.3); color: #fff;
-      font-size: 30px; font-weight: 700; letter-spacing: -.3px; line-height: 1.28;
+      font-size: 30px; font-weight: 700; letter-spacing: -.3px; line-height: 1;
       text-align: center; white-space: nowrap;
     }
     .pv-s01-copy-wrap {
@@ -298,10 +299,11 @@
     /* Figma chip_계약형태 (265:726) */
     .pv-proc-chip {
       display: inline-flex; align-items: center; justify-content: center;
-      height: 28px; padding: 3px 8px; border-radius: 7px;
-      font-size: 16px; font-weight: 500; line-height: 1.4; white-space: nowrap;
+      box-sizing: border-box;
+      height: 28px; padding: 0 8px; border-radius: 7px;
+      font-size: 16px; font-weight: 500; line-height: 1; white-space: nowrap;
     }
-    .pv-proc-chip .chip-sub { font-size: 14px; line-height: 1.4; }
+    .pv-proc-chip .chip-sub { font-size: 14px; line-height: 1; }
     .pv-proc-chip.is-regular { background: rgba(0,177,204,.15); color: #00b1cc; }
     .pv-proc-chip.is-contract,
     .pv-proc-chip.is-contract-convert { background: rgba(98,196,0,.15); color: #5fb10d; }
@@ -316,9 +318,9 @@
       flex: 1 1 0; min-width: 0;
       display: flex; align-items: center; justify-content: center;
       box-sizing: border-box;
-      min-height: 73px; height: auto; padding: 14px 12px;
+      min-height: 73px; height: auto; padding: 16px 12px;
       background: #f7f8fa; border-radius: 10px;
-      font-size: 22px; font-weight: 600; line-height: 1.4; color: #1e3a47;
+      font-size: 22px; font-weight: 600; line-height: 1.35; color: #1e3a47;
       text-align: center;
       word-break: keep-all;
       overflow-wrap: anywhere;
@@ -391,11 +393,12 @@
     }
     .pv-dept-chip {
       display: inline-flex; align-items: center; justify-content: center;
-      height: 28px; padding: 3px 8px; border-radius: 7px;
-      font-size: 16px; font-weight: 500; line-height: 1.4; white-space: nowrap;
+      box-sizing: border-box;
+      height: 28px; padding: 0 8px; border-radius: 7px;
+      font-size: 16px; font-weight: 500; line-height: 1; white-space: nowrap;
       align-self: flex-start; flex-shrink: 0;
     }
-    .pv-dept-chip .chip-sub { font-size: 14px; line-height: 1.4; }
+    .pv-dept-chip .chip-sub { font-size: 14px; line-height: 1; }
     .pv-dept-chip.is-regular { background: rgba(0,177,204,.15); color: #00b1cc; }
     .pv-dept-chip.is-contract,
     .pv-dept-chip.is-contract-convert { background: rgba(98,196,0,.15); color: #5fb10d; }
@@ -550,9 +553,12 @@
     .pv-benefit-item { display: flex; flex-direction: column; gap: 12px; }
     .pv-benefit-item-title {
       display: flex; align-items: center; gap: 12px;
-      margin: 0; font-size: 22px; font-weight: 700; line-height: 1.75; color: #1e3a47;
+      margin: 0; font-size: 22px; font-weight: 700; line-height: 1.2; color: #1e3a47;
     }
-    .pv-benefit-item-title img { width: 30px; height: 30px; flex-shrink: 0; object-fit: contain; }
+    .pv-benefit-item-title img {
+      display: block; width: 30px; height: 30px; flex-shrink: 0;
+      object-fit: contain; object-position: center;
+    }
     .pv-benefit-item > p:not(.pv-benefit-item-title) {
       margin: 0; font-size: 20px; font-weight: 400; line-height: 1.75; color: #1e3a47;
       word-break: keep-all; white-space: pre-wrap;
@@ -590,11 +596,11 @@
     }
     .pv-ig-badge {
       display: flex; align-items: center; justify-content: center;
-      width: auto; max-width: 100%; min-width: 0; min-height: 91px;
-      padding: 23px 38px 21px 36px;
+      width: auto; max-width: 100%; min-width: 0; height: 91px;
+      padding: 0 38px 0 36px;
       border-radius: 114px; box-sizing: border-box; flex-shrink: 0;
       background: rgba(255,255,255,.3); color: #fff;
-      font-size: 36.4px; font-weight: 700; letter-spacing: -.36px; line-height: 1.28;
+      font-size: 36.4px; font-weight: 700; letter-spacing: -.36px; line-height: 1;
       text-align: center; white-space: nowrap;
     }
     .pv-ig-main {
@@ -633,6 +639,31 @@
       background: #00b1cc;
       transform: none;
       margin-bottom: 0;
+    }
+
+    /*
+      html2canvas는 한글 글리프를 flex 중앙보다 약간 아래에 그리는 경우가 많음.
+      캡처 전용 보정: 배경(패딩 박스)은 유지하고 텍스트 광학 중심만 위로.
+    */
+    #preview-canvas.is-capturing .pv-badge,
+    .pv-ig-story.is-capturing .pv-ig-badge {
+      padding-top: 0;
+      padding-bottom: 4px;
+    }
+    #preview-canvas.is-capturing .pv-proc-chip,
+    #preview-canvas.is-capturing .pv-dept-chip {
+      padding-top: 0;
+      padding-bottom: 2px;
+    }
+    #preview-canvas.is-capturing .pv-proc-item {
+      padding-top: 14px;
+      padding-bottom: 18px;
+    }
+    #preview-canvas.is-capturing .pv-benefit-item-title img,
+    #preview-canvas.is-capturing .pv-principle-card img,
+    #preview-canvas.is-capturing .pv-work-icon img {
+      position: relative;
+      top: -1px;
     }
   </style>
 </head>
@@ -2551,6 +2582,101 @@ function attachPreviewScrollSync() {
 // ─────────────────────────────────────────────────────────────
 // DOWNLOAD
 // ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// DOWNLOAD
+// ─────────────────────────────────────────────────────────────
+/** html2canvas는 background-clip:text 그라데이션을 박스로 그리므로, 캡처 전 래스터화 */
+function rasterizeGradientTextForCapture(root) {
+  const nodes = Array.from(root.querySelectorAll('.pv-heading, .pv-s05-eco-title'));
+  const restorers = [];
+  const GRADIENTS = {
+    'pv-heading': {
+      angleDeg: 14,
+      stops: [
+        { offset: 0.13, color: '#26c4ec' },
+        { offset: 0.5, color: '#36bfd4' },
+        { offset: 0.87, color: '#2acfe8' }
+      ]
+    },
+    'pv-s05-eco-title': {
+      angleDeg: 6,
+      stops: [
+        { offset: 0.08, color: '#1ba6f7' },
+        { offset: 0.27, color: '#2079ff' },
+        { offset: 0.91, color: '#17d3ef' }
+      ]
+    }
+  };
+
+  nodes.forEach(el => {
+    const cs = getComputedStyle(el);
+    const w = Math.ceil(el.offsetWidth);
+    const h = Math.ceil(el.offsetHeight);
+    if (!w || !h) return;
+
+    const key = el.classList.contains('pv-s05-eco-title') ? 'pv-s05-eco-title' : 'pv-heading';
+    const conf = GRADIENTS[key];
+    const scale = 2;
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, w * scale);
+    c.height = Math.max(1, h * scale);
+    const ctx = c.getContext('2d');
+    ctx.scale(scale, scale);
+
+    const fontSize = parseFloat(cs.fontSize) || 34;
+    const fontWeight = cs.fontWeight || '700';
+    const fontFamily = cs.fontFamily || "'SUIT', 'Noto Sans KR', sans-serif";
+    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+
+    const rad = (conf.angleDeg * Math.PI) / 180;
+    const grad = ctx.createLinearGradient(0, 0, Math.cos(rad) * w, Math.sin(rad) * h);
+    conf.stops.forEach(s => grad.addColorStop(s.offset, s.color));
+    ctx.fillStyle = grad;
+
+    let lineHeight = parseFloat(cs.lineHeight);
+    if (!lineHeight || Number.isNaN(lineHeight)) {
+      lineHeight = fontSize * (key === 'pv-heading' ? 1.48 : 1.68);
+    }
+    const tracking = parseFloat(cs.letterSpacing) || 0;
+    const lines = String(el.innerText || '').replace(/\r\n/g, '\n').split('\n');
+
+    lines.forEach((line, i) => {
+      const y = i * lineHeight;
+      if (!tracking) {
+        ctx.fillText(line, 0, y);
+        return;
+      }
+      let x = 0;
+      for (const ch of line) {
+        ctx.fillText(ch, x, y);
+        x += ctx.measureText(ch).width + tracking;
+      }
+    });
+
+    const img = document.createElement('img');
+    img.src = c.toDataURL('image/png');
+    img.alt = el.innerText || '';
+    img.width = w;
+    img.height = h;
+    img.setAttribute('data-gradient-raster', '1');
+    img.style.cssText = `display:block;width:${w}px;height:${h}px;margin:0;padding:0;border:0;`;
+
+    const parent = el.parentNode;
+    if (!parent) return;
+    const next = el.nextSibling;
+    parent.replaceChild(img, el);
+    restorers.push(() => {
+      if (img.parentNode === parent) parent.replaceChild(el, img);
+      else if (next && next.parentNode === parent) parent.insertBefore(el, next);
+      else parent.appendChild(el);
+    });
+  });
+
+  return () => { restorers.forEach(fn => { try { fn(); } catch (_) {} }); };
+}
+
 async function downloadImage() {
   const btn    = document.getElementById('dl-btn');
   const canvas = document.getElementById('preview-canvas');
@@ -2565,6 +2691,7 @@ async function downloadImage() {
     canvas.classList.add('is-story-capture');
   }
 
+  let restoreGradientText = null;
   try {
     // 이미지 로드 완료 대기 (미로드 시 캡처 실패/빈 이미지 방지)
     const imgs = Array.from(canvas.querySelectorAll('img'));
@@ -2578,7 +2705,23 @@ async function downloadImage() {
         setTimeout(done, 8000);
       });
     }));
+    if (document.fonts && document.fonts.ready) {
+      try { await document.fonts.ready; } catch (_) {}
+    }
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    // background-clip:text → 래스터 이미지로 치환 (추출 시 그라데이션 박스 버그 방지)
+    restoreGradientText = rasterizeGradientTextForCapture(canvas);
+    await Promise.all(
+      Array.from(canvas.querySelectorAll('img[data-gradient-raster="1"]')).map(img => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return img.decode ? img.decode().catch(() => {}) : new Promise(r => {
+          img.onload = () => r();
+          img.onerror = () => r();
+          setTimeout(r, 2000);
+        });
+      })
+    );
 
     const storyEl = wasStoryScaled ? canvas.querySelector('.pv-ig-story') : null;
     const captureEl = storyEl || canvas;
@@ -2600,7 +2743,13 @@ async function downloadImage() {
       windowHeight: h,
       logging: false,
       imageTimeout: 20000,
-      foreignObjectRendering: false
+      foreignObjectRendering: false,
+      onclone(clonedDoc, el) {
+        // 캡처 전용 한글 광학 정렬 보정
+        el.classList.add('is-capturing');
+        const canvasClone = clonedDoc.getElementById('preview-canvas');
+        if (canvasClone) canvasClone.classList.add('is-capturing');
+      }
     });
 
     const corp = resolveCorp();
@@ -2639,6 +2788,7 @@ async function downloadImage() {
       btn.innerHTML = isStoryTemplate() ? '📷 &nbsp;스토리 이미지 다운로드' : '📷 &nbsp;채용 공고 이미지 다운로드';
     }, 3000);
   } finally {
+    if (typeof restoreGradientText === 'function') restoreGradientText();
     if (wasStoryScaled) {
       canvas.classList.remove('is-story-capture');
       canvas.classList.add('is-story');
