@@ -227,12 +227,13 @@
       flex-shrink: 0;
     }
     .pv-badge {
-      display: flex; align-items: center; justify-content: center;
-      box-sizing: border-box;
+      /* html2canvas: flex 수직중앙 대신 line-height=height 사용 */
+      display: inline-block; box-sizing: border-box;
       min-width: 326px; height: 72px; padding: 0 30px; border-radius: 90px;
       background: rgba(255,255,255,.3); color: #fff;
-      font-size: 30px; font-weight: 700; letter-spacing: -.3px; line-height: 1;
-      text-align: center; white-space: nowrap;
+      font-size: 30px; font-weight: 700; letter-spacing: -.3px;
+      line-height: 72px; text-align: center; white-space: nowrap;
+      vertical-align: middle;
     }
     .pv-s01-copy-wrap {
       width: 100%; display: flex; flex-direction: column; align-items: center; gap: 38px;
@@ -298,12 +299,12 @@
     }
     /* Figma chip_계약형태 (265:726) */
     .pv-proc-chip {
-      display: inline-flex; align-items: center; justify-content: center;
-      box-sizing: border-box;
+      display: inline-block; box-sizing: border-box;
       height: 28px; padding: 0 8px; border-radius: 7px;
-      font-size: 16px; font-weight: 500; line-height: 1; white-space: nowrap;
+      font-size: 16px; font-weight: 500; line-height: 28px; white-space: nowrap;
+      text-align: center; vertical-align: middle;
     }
-    .pv-proc-chip .chip-sub { font-size: 14px; line-height: 1; }
+    .pv-proc-chip .chip-sub { font-size: 14px; line-height: 28px; vertical-align: middle; }
     .pv-proc-chip.is-regular { background: rgba(0,177,204,.15); color: #00b1cc; }
     .pv-proc-chip.is-contract,
     .pv-proc-chip.is-contract-convert { background: rgba(98,196,0,.15); color: #5fb10d; }
@@ -315,16 +316,18 @@
       justify-content: space-between; gap: 10px; width: 100%;
     }
     .pv-proc-item {
+      /* html2canvas는 flex align-items:center를 자주 깨뜨림 → table-cell */
       flex: 1 1 0; min-width: 0;
-      display: flex; align-items: center; justify-content: center;
-      box-sizing: border-box;
-      min-height: 73px; height: auto; padding: 16px 12px;
+      display: table; box-sizing: border-box;
+      min-height: 73px; height: 73px;
       background: #f7f8fa; border-radius: 10px;
-      font-size: 22px; font-weight: 600; line-height: 1.35; color: #1e3a47;
-      text-align: center;
-      word-break: keep-all;
-      overflow-wrap: anywhere;
-      white-space: normal;
+      font-size: 22px; font-weight: 600; color: #1e3a47;
+    }
+    .pv-proc-item-txt {
+      display: table-cell; vertical-align: middle; text-align: center;
+      padding: 10px 12px; box-sizing: border-box;
+      line-height: 1.35;
+      word-break: keep-all; overflow-wrap: anywhere; white-space: normal;
     }
     /* Figma ic_process (37:711) */
     .pv-proc-dots {
@@ -392,13 +395,13 @@
       text-align: left; width: 100%;
     }
     .pv-dept-chip {
-      display: inline-flex; align-items: center; justify-content: center;
-      box-sizing: border-box;
+      display: inline-block; box-sizing: border-box;
       height: 28px; padding: 0 8px; border-radius: 7px;
-      font-size: 16px; font-weight: 500; line-height: 1; white-space: nowrap;
+      font-size: 16px; font-weight: 500; line-height: 28px; white-space: nowrap;
+      text-align: center; vertical-align: middle;
       align-self: flex-start; flex-shrink: 0;
     }
-    .pv-dept-chip .chip-sub { font-size: 14px; line-height: 1; }
+    .pv-dept-chip .chip-sub { font-size: 14px; line-height: 28px; vertical-align: middle; }
     .pv-dept-chip.is-regular { background: rgba(0,177,204,.15); color: #00b1cc; }
     .pv-dept-chip.is-contract,
     .pv-dept-chip.is-contract-convert { background: rgba(98,196,0,.15); color: #5fb10d; }
@@ -595,13 +598,13 @@
       overflow: visible;
     }
     .pv-ig-badge {
-      display: flex; align-items: center; justify-content: center;
+      display: inline-block; box-sizing: border-box; flex-shrink: 0;
       width: auto; max-width: 100%; min-width: 0; height: 91px;
-      padding: 0 38px 0 36px;
-      border-radius: 114px; box-sizing: border-box; flex-shrink: 0;
+      padding: 0 38px 0 36px; border-radius: 114px;
       background: rgba(255,255,255,.3); color: #fff;
-      font-size: 36.4px; font-weight: 700; letter-spacing: -.36px; line-height: 1;
-      text-align: center; white-space: nowrap;
+      font-size: 36.4px; font-weight: 700; letter-spacing: -.36px;
+      line-height: 91px; text-align: center; white-space: nowrap;
+      vertical-align: middle;
     }
     .pv-ig-main {
       margin: 0; width: 100%; max-width: 739px; color: #fff; text-align: center;
@@ -642,22 +645,41 @@
     }
 
     /*
-      html2canvas는 한글 글리프를 flex 중앙보다 약간 아래에 그리는 경우가 많음.
-      캡처 전용 보정: 배경(패딩 박스)은 유지하고 텍스트 광학 중심만 위로.
+      html2canvas Hangul: 글리프가 줄 박스 하단에 붙어 그려지는 경우가 많음.
+      캡처 시 텍스트만 위로 올려 광학 중앙에 맞춤 (배경 박스는 유지).
     */
     #preview-canvas.is-capturing .pv-badge,
     .pv-ig-story.is-capturing .pv-ig-badge {
+      line-height: 68px;
       padding-top: 0;
       padding-bottom: 4px;
     }
     #preview-canvas.is-capturing .pv-proc-chip,
     #preview-canvas.is-capturing .pv-dept-chip {
-      padding-top: 0;
+      line-height: 26px;
       padding-bottom: 2px;
     }
-    #preview-canvas.is-capturing .pv-proc-item {
-      padding-top: 14px;
-      padding-bottom: 18px;
+    #preview-canvas.is-capturing .pv-proc-item-txt {
+      position: relative;
+      top: -3px;
+    }
+    #preview-canvas.is-capturing .pv-main-copy,
+    #preview-canvas.is-capturing .pv-sub-copy,
+    .pv-ig-story.is-capturing .pv-ig-main,
+    .pv-ig-story.is-capturing .pv-ig-sub {
+      position: relative;
+      top: -0.06em;
+    }
+    #preview-canvas.is-capturing .pv-benefit-item-title,
+    #preview-canvas.is-capturing .pv-proc-title,
+    #preview-canvas.is-capturing .pv-sec-label,
+    #preview-canvas.is-capturing .pv-info-val,
+    #preview-canvas.is-capturing .pv-dept-cat,
+    #preview-canvas.is-capturing .pv-dept-title,
+    #preview-canvas.is-capturing .pv-stat-label,
+    #preview-canvas.is-capturing .pv-stat-val {
+      position: relative;
+      top: -1px;
     }
     #preview-canvas.is-capturing .pv-benefit-item-title img,
     #preview-canvas.is-capturing .pv-principle-card img,
@@ -2204,7 +2226,7 @@ function renderPreview() {
       const category = (track.category || '').trim() || '채용분류';
       const steps = track.steps.map(s => String(s).trim()).filter(Boolean);
       const procItems = steps.map((p, i) =>
-        `${i > 0 ? '<span class="pv-proc-dots" aria-hidden="true"><i></i><i></i></span>' : ''}<span class="pv-proc-item">${htmlEsc(p)}</span>`
+        `${i > 0 ? '<span class="pv-proc-dots" aria-hidden="true"><i></i><i></i></span>' : ''}<span class="pv-proc-item"><span class="pv-proc-item-txt">${htmlEsc(p)}</span></span>`
       ).join('');
       return `<div class="pv-proc-track">
         <div class="pv-proc-head">
@@ -2582,9 +2604,6 @@ function attachPreviewScrollSync() {
 // ─────────────────────────────────────────────────────────────
 // DOWNLOAD
 // ─────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────
-// DOWNLOAD
-// ─────────────────────────────────────────────────────────────
 /** html2canvas는 background-clip:text 그라데이션을 박스로 그리므로, 캡처 전 래스터화 */
 function rasterizeGradientTextForCapture(root) {
   const nodes = Array.from(root.querySelectorAll('.pv-heading, .pv-s05-eco-title'));
@@ -2677,6 +2696,123 @@ function rasterizeGradientTextForCapture(root) {
   return () => { restorers.forEach(fn => { try { fn(); } catch (_) {} }); };
 }
 
+/** 수직 중앙 텍스트 박스(배지/칩/전형단계) — html2canvas flex/line-height 깨짐 방지용 래스터화 */
+function rasterizeVCenterBoxesForCapture(root) {
+  const selectors = [
+    '.pv-badge',
+    '.pv-ig-badge',
+    '.pv-proc-chip',
+    '.pv-dept-chip',
+    '.pv-proc-item'
+  ];
+  const nodes = Array.from(root.querySelectorAll(selectors.join(',')));
+  const restorers = [];
+
+  function roundRect(ctx, x, y, w, h, r) {
+    const radius = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + w, y, x + w, y + h, radius);
+    ctx.arcTo(x + w, y + h, x, y + h, radius);
+    ctx.arcTo(x, y + h, x, y, radius);
+    ctx.arcTo(x, y, x + w, y, radius);
+    ctx.closePath();
+  }
+
+  function parseRadius(cs) {
+    const raw = (cs.borderRadius || '0').split(' ')[0];
+    return parseFloat(raw) || 0;
+  }
+
+  nodes.forEach(el => {
+    const cs = getComputedStyle(el);
+    const w = Math.ceil(el.offsetWidth);
+    const h = Math.ceil(el.offsetHeight);
+    if (!w || !h) return;
+
+    const scale = 2;
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, w * scale);
+    c.height = Math.max(1, h * scale);
+    const ctx = c.getContext('2d');
+    ctx.scale(scale, scale);
+
+    const bg = cs.backgroundColor;
+    if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+      roundRect(ctx, 0, 0, w, h, parseRadius(cs));
+      ctx.fillStyle = bg;
+      ctx.fill();
+    }
+
+    const fontSize = parseFloat(cs.fontSize) || 16;
+    const fontWeight = cs.fontWeight || '600';
+    const fontFamily = cs.fontFamily || "'SUIT', 'Noto Sans KR', sans-serif";
+    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+    ctx.fillStyle = cs.color || '#1e3a47';
+    ctx.textAlign = 'center';
+    // alphabetic + manual optical center works more consistently for Hangul than 'middle'
+    ctx.textBaseline = 'alphabetic';
+
+    const tracking = parseFloat(cs.letterSpacing) || 0;
+    const text = String(el.innerText || '').replace(/\s+/g, ' ').trim();
+    const metrics = ctx.measureText(text || '가');
+    const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
+    const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
+    // 광학 중앙: 박스 중앙보다 약간 위(한글 descent 보정)
+    const baselineY = h / 2 + (ascent - descent) / 2 - fontSize * 0.04;
+
+    if (!tracking) {
+      ctx.fillText(text, w / 2, baselineY);
+    } else {
+      // letter-spacing: measure full width then draw from center
+      let total = 0;
+      const chars = Array.from(text);
+      chars.forEach((ch, i) => {
+        total += ctx.measureText(ch).width + (i < chars.length - 1 ? tracking : 0);
+      });
+      let x = (w - total) / 2;
+      chars.forEach((ch, i) => {
+        ctx.textAlign = 'left';
+        ctx.fillText(ch, x, baselineY);
+        x += ctx.measureText(ch).width + tracking;
+      });
+    }
+
+    const img = document.createElement('img');
+    img.src = c.toDataURL('image/png');
+    img.alt = text;
+    img.width = w;
+    img.height = h;
+    img.setAttribute('data-vcenter-raster', '1');
+    img.style.cssText = `display:block;width:${w}px;height:${h}px;margin:0;padding:0;border:0;flex:${cs.flex || 'none'};flex-shrink:${cs.flexShrink || '0'};`;
+    // preserve flex-grow for proc-item
+    if (el.classList.contains('pv-proc-item')) {
+      img.style.flex = '1 1 0';
+      img.style.minWidth = '0';
+      img.style.borderRadius = cs.borderRadius;
+    } else if (el.classList.contains('pv-badge') || el.classList.contains('pv-ig-badge')) {
+      img.style.display = 'inline-block';
+      img.style.borderRadius = cs.borderRadius;
+    } else {
+      img.style.display = 'inline-block';
+      img.style.verticalAlign = 'middle';
+      img.style.borderRadius = cs.borderRadius;
+    }
+
+    const parent = el.parentNode;
+    if (!parent) return;
+    const next = el.nextSibling;
+    parent.replaceChild(img, el);
+    restorers.push(() => {
+      if (img.parentNode === parent) parent.replaceChild(el, img);
+      else if (next && next.parentNode === parent) parent.insertBefore(el, next);
+      else parent.appendChild(el);
+    });
+  });
+
+  return () => { restorers.forEach(fn => { try { fn(); } catch (_) {} }); };
+}
+
 async function downloadImage() {
   const btn    = document.getElementById('dl-btn');
   const canvas = document.getElementById('preview-canvas');
@@ -2692,6 +2828,7 @@ async function downloadImage() {
   }
 
   let restoreGradientText = null;
+  let restoreVCenterBoxes = null;
   try {
     // 이미지 로드 완료 대기 (미로드 시 캡처 실패/빈 이미지 방지)
     const imgs = Array.from(canvas.querySelectorAll('img'));
@@ -2710,10 +2847,12 @@ async function downloadImage() {
     }
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
+    // 배지/칩/전형단계: 수직 중앙 텍스트를 캔버스로 고정 (한글 하단 처짐 방지)
+    restoreVCenterBoxes = rasterizeVCenterBoxesForCapture(canvas);
     // background-clip:text → 래스터 이미지로 치환 (추출 시 그라데이션 박스 버그 방지)
     restoreGradientText = rasterizeGradientTextForCapture(canvas);
     await Promise.all(
-      Array.from(canvas.querySelectorAll('img[data-gradient-raster="1"]')).map(img => {
+      Array.from(canvas.querySelectorAll('img[data-gradient-raster="1"], img[data-vcenter-raster="1"]')).map(img => {
         if (img.complete && img.naturalWidth > 0) return Promise.resolve();
         return img.decode ? img.decode().catch(() => {}) : new Promise(r => {
           img.onload = () => r();
@@ -2789,6 +2928,7 @@ async function downloadImage() {
     }, 3000);
   } finally {
     if (typeof restoreGradientText === 'function') restoreGradientText();
+    if (typeof restoreVCenterBoxes === 'function') restoreVCenterBoxes();
     if (wasStoryScaled) {
       canvas.classList.remove('is-story-capture');
       canvas.classList.add('is-story');
