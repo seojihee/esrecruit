@@ -264,8 +264,7 @@
     .pv-heading {
       margin: 0; font-size: 38px; font-weight: 700; line-height: 1.48; letter-spacing: -.76px;
       white-space: pre-wrap; word-break: keep-all;
-      background-image: linear-gradient(14deg, #26c4ec 13%, #36bfd4 50%, #2acfe8 87%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
+      color: #00b1cc;
     }
     .pv-body {
       margin: 0; font-size: 28px; font-weight: 500; line-height: 1.6; letter-spacing: -.56px;
@@ -347,14 +346,17 @@
     .pv-sched-list { width: 100%; display: flex; flex-direction: column; }
     .pv-sched-row {
       display: flex; align-items: center; gap: 20px; min-height: 90px;
+      padding: 14px 0 22px; box-sizing: border-box;
       border-top: 1px solid #ced4da; border-bottom: 1px solid #ced4da; margin-top: -1px;
     }
     .pv-sched-title {
       width: 140px; flex-shrink: 0; font-size: 24px; font-weight: 700;
       letter-spacing: -.24px; color: #1e3a47; line-height: 1.5;
+      padding-bottom: 4px;
     }
     .pv-sched-val {
       flex: 1; font-size: 28px; font-weight: 500; color: #1e3a47; line-height: 1.5; word-break: keep-all;
+      padding-bottom: 4px;
     }
 
     /* ── Section 04: 모집부문 ── */
@@ -378,17 +380,18 @@
     .pv-dept-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .pv-dept-table thead th {
       background: #f7f8fa; color: #1e3a47; font-size: 22px; font-weight: 700;
-      text-align: left; padding: 18px 16px; border: none; border-bottom: 1px solid #ced4da;
+      text-align: left; padding: 16px 16px 22px; border: none; border-bottom: 1px solid #ced4da;
       line-height: 1.6; vertical-align: middle;
     }
     .pv-dept-table tbody td {
-      padding: 16px; vertical-align: top; border-bottom: 1px solid #ced4da;
+      padding: 14px 16px 22px; vertical-align: middle; border-bottom: 1px solid #ced4da;
       color: #1e3a47; word-break: keep-all; line-height: 1.6;
       text-align: left;
     }
     .pv-dept-table tbody tr:last-child td { border-bottom: 1px solid #ced4da; }
     .pv-dept-cat-cell {
       display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+      padding-bottom: 2px;
     }
     .pv-dept-cat {
       font-size: 24px; font-weight: 600; line-height: 1.6; margin: 0;
@@ -673,9 +676,28 @@
     #preview-canvas.is-capturing .pv-benefit-item-title,
     #preview-canvas.is-capturing .pv-proc-title,
     #preview-canvas.is-capturing .pv-sec-label,
-    #preview-canvas.is-capturing .pv-info-val,
+    #preview-canvas.is-capturing .pv-info-val {
+      position: relative;
+      top: -1px;
+    }
+    #preview-canvas.is-capturing .pv-sched-title,
+    #preview-canvas.is-capturing .pv-sched-val {
+      padding-bottom: 8px;
+    }
+    #preview-canvas.is-capturing .pv-dept-table thead th {
+      padding-bottom: 26px;
+    }
+    #preview-canvas.is-capturing .pv-dept-table tbody td {
+      padding-bottom: 26px;
+    }
     #preview-canvas.is-capturing .pv-dept-cat,
     #preview-canvas.is-capturing .pv-dept-title,
+    #preview-canvas.is-capturing .pv-dept-eng,
+    #preview-canvas.is-capturing .pv-dept-tasks,
+    #preview-canvas.is-capturing .pv-dept-team {
+      position: relative;
+      top: -2px;
+    }
     #preview-canvas.is-capturing .pv-stat-label,
     #preview-canvas.is-capturing .pv-stat-val {
       position: relative;
@@ -856,7 +878,7 @@ const CORP = {
   conceptual: {
     name: '컨셉추얼',
     label: '컨셉추얼',
-    color: '#2563eb',
+    color: '#6E5B4A',
     bg: 'assets/bg/bg-conceptual.png',
     logoInBg: true,
     logo: 'assets/logo/logo-conceptual.png',
@@ -2196,7 +2218,7 @@ function renderPreview() {
   const bannerIntro = S.bannerIntro || corp.intro || '';
   const s02 = `
 <div class="pv-s02" id="preview-s02">
-  <h2 class="pv-heading" id="preview-heading">${htmlEsc(bannerHeading)}</h2>
+  <h2 class="pv-heading" id="preview-heading" style="color:${color};">${htmlEsc(bannerHeading)}</h2>
   <p class="pv-body" id="preview-intro">${htmlEsc(bannerIntro)}</p>
 </div>`;
 
@@ -2606,25 +2628,15 @@ function attachPreviewScrollSync() {
 // ─────────────────────────────────────────────────────────────
 /** html2canvas는 background-clip:text 그라데이션을 박스로 그리므로, 캡처 전 래스터화 */
 function rasterizeGradientTextForCapture(root) {
-  const nodes = Array.from(root.querySelectorAll('.pv-heading, .pv-s05-eco-title'));
+  const nodes = Array.from(root.querySelectorAll('.pv-s05-eco-title'));
   const restorers = [];
-  const GRADIENTS = {
-    'pv-heading': {
-      angleDeg: 14,
-      stops: [
-        { offset: 0.13, color: '#26c4ec' },
-        { offset: 0.5, color: '#36bfd4' },
-        { offset: 0.87, color: '#2acfe8' }
-      ]
-    },
-    'pv-s05-eco-title': {
-      angleDeg: 6,
-      stops: [
-        { offset: 0.08, color: '#1ba6f7' },
-        { offset: 0.27, color: '#2079ff' },
-        { offset: 0.91, color: '#17d3ef' }
-      ]
-    }
+  const conf = {
+    angleDeg: 6,
+    stops: [
+      { offset: 0.08, color: '#1ba6f7' },
+      { offset: 0.27, color: '#2079ff' },
+      { offset: 0.91, color: '#17d3ef' }
+    ]
   };
 
   nodes.forEach(el => {
@@ -2633,8 +2645,6 @@ function rasterizeGradientTextForCapture(root) {
     const h = Math.ceil(el.offsetHeight);
     if (!w || !h) return;
 
-    const key = el.classList.contains('pv-s05-eco-title') ? 'pv-s05-eco-title' : 'pv-heading';
-    const conf = GRADIENTS[key];
     const scale = 2;
     const c = document.createElement('canvas');
     c.width = Math.max(1, w * scale);
@@ -2656,7 +2666,7 @@ function rasterizeGradientTextForCapture(root) {
 
     let lineHeight = parseFloat(cs.lineHeight);
     if (!lineHeight || Number.isNaN(lineHeight)) {
-      lineHeight = fontSize * (key === 'pv-heading' ? 1.48 : 1.68);
+      lineHeight = fontSize * 1.68;
     }
     const tracking = parseFloat(cs.letterSpacing) || 0;
     const lines = String(el.innerText || '').replace(/\r\n/g, '\n').split('\n');
