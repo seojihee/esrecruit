@@ -648,66 +648,60 @@
     }
 
     /*
-      html2canvas Hangul: 글리프가 줄 박스 하단에 붙어 그려지는 경우가 많음.
-      캡처 시 텍스트만 위로 올려 광학 중앙에 맞춤 (배경 박스는 유지).
+      html2canvas Hangul: 브라우저 대비 글리프가 줄 박스 하단에 붙어 그려짐.
+      transform은 레이아웃(박스 크기)을 바꾸지 않고 광학 위치만 보정한다.
+      배지/칩 등 래스터 치환된 img에는 적용되지 않음.
     */
-    #preview-canvas.is-capturing .pv-badge,
-    .pv-ig-story.is-capturing .pv-ig-badge {
-      line-height: 68px;
-      padding-top: 0;
-      padding-bottom: 4px;
+    #preview-canvas.is-capturing,
+    .pv-ig-story.is-capturing {
+      --capture-text-nudge: -0.1em;
     }
-    #preview-canvas.is-capturing .pv-proc-chip,
-    #preview-canvas.is-capturing .pv-dept-chip {
-      line-height: 26px;
-      padding-bottom: 2px;
-    }
-    #preview-canvas.is-capturing .pv-proc-item-txt {
-      position: relative;
-      top: -3px;
-    }
-    #preview-canvas.is-capturing .pv-main-copy,
-    #preview-canvas.is-capturing .pv-sub-copy,
-    .pv-ig-story.is-capturing .pv-ig-main,
-    .pv-ig-story.is-capturing .pv-ig-sub {
-      position: relative;
-      top: -0.06em;
-    }
-    #preview-canvas.is-capturing .pv-benefit-item-title,
-    #preview-canvas.is-capturing .pv-proc-title,
-    #preview-canvas.is-capturing .pv-sec-label,
-    #preview-canvas.is-capturing .pv-info-val {
-      position: relative;
-      top: -1px;
-    }
-    #preview-canvas.is-capturing .pv-sched-title,
-    #preview-canvas.is-capturing .pv-sched-val {
-      padding-bottom: 8px;
-    }
-    #preview-canvas.is-capturing .pv-dept-table thead th {
-      padding-bottom: 26px;
-    }
-    #preview-canvas.is-capturing .pv-dept-table tbody td {
-      padding-bottom: 26px;
-    }
-    #preview-canvas.is-capturing .pv-dept-cat,
-    #preview-canvas.is-capturing .pv-dept-title,
-    #preview-canvas.is-capturing .pv-dept-eng,
-    #preview-canvas.is-capturing .pv-dept-tasks,
-    #preview-canvas.is-capturing .pv-dept-team {
-      position: relative;
-      top: -2px;
-    }
-    #preview-canvas.is-capturing .pv-stat-label,
-    #preview-canvas.is-capturing .pv-stat-val {
-      position: relative;
-      top: -1px;
-    }
-    #preview-canvas.is-capturing .pv-benefit-item-title img,
-    #preview-canvas.is-capturing .pv-principle-card img,
-    #preview-canvas.is-capturing .pv-work-icon img {
-      position: relative;
-      top: -1px;
+    #preview-canvas.is-capturing :is(
+      .pv-main-copy,
+      .pv-sub-copy,
+      .pv-corp-badge,
+      .pv-heading,
+      .pv-body,
+      .pv-sec-label,
+      .pv-info-val,
+      .pv-apply-title,
+      .pv-apply-url,
+      .pv-apply-flow,
+      .pv-proc-title,
+      .pv-proc-item-txt,
+      .pv-note,
+      .pv-sched-title,
+      .pv-sched-val,
+      .pv-hire-intro,
+      .pv-hire-logo-fallback,
+      .pv-dept-cat,
+      .pv-dept-title,
+      .pv-dept-eng,
+      .pv-dept-tasks,
+      .pv-dept-team,
+      .pv-dept-table thead th,
+      .pv-s05-eco-body,
+      .pv-s05-h,
+      .pv-s05-sub,
+      .pv-s05-note,
+      .pv-stat-label,
+      .pv-stat-val,
+      .pv-award-title,
+      .pv-award-desc,
+      .pv-principle-text h4,
+      .pv-principle-text p,
+      .pv-work-copy h4,
+      .pv-work-copy p,
+      .pv-benefit-label,
+      .pv-benefit-item-title,
+      .pv-benefit-item > p:not(.pv-benefit-item-title),
+      .pv-empty
+    ),
+    .pv-ig-story.is-capturing :is(
+      .pv-ig-main,
+      .pv-ig-sub
+    ) {
+      transform: translateY(var(--capture-text-nudge));
     }
   </style>
 </head>
@@ -2657,7 +2651,7 @@ function rasterizeGradientTextForCapture(root) {
     const fontFamily = cs.fontFamily || "'SUIT', 'Noto Sans KR', sans-serif";
     ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
     ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
+    ctx.textBaseline = 'alphabetic';
 
     const rad = (conf.angleDeg * Math.PI) / 180;
     const grad = ctx.createLinearGradient(0, 0, Math.cos(rad) * w, Math.sin(rad) * h);
@@ -2670,9 +2664,14 @@ function rasterizeGradientTextForCapture(root) {
     }
     const tracking = parseFloat(cs.letterSpacing) || 0;
     const lines = String(el.innerText || '').replace(/\r\n/g, '\n').split('\n');
+    const sample = ctx.measureText('한글Ag');
+    const ascent = sample.actualBoundingBoxAscent || fontSize * 0.8;
+    const descent = sample.actualBoundingBoxDescent || fontSize * 0.2;
+    // 줄 박스 광학 중앙 (브라우저와 동일하게 살짝 위)
+    const baselineInLine = lineHeight / 2 + (ascent - descent) / 2 - fontSize * 0.04;
 
     lines.forEach((line, i) => {
-      const y = i * lineHeight;
+      const y = i * lineHeight + baselineInLine;
       if (!tracking) {
         ctx.fillText(line, 0, y);
         return;
@@ -2898,6 +2897,41 @@ async function downloadImage() {
         el.classList.add('is-capturing');
         const canvasClone = clonedDoc.getElementById('preview-canvas');
         if (canvasClone) canvasClone.classList.add('is-capturing');
+        const storyClone = clonedDoc.querySelector('.pv-ig-story');
+        if (storyClone) storyClone.classList.add('is-capturing');
+
+        // html2canvas가 커스텀 프로퍼티/일부 transform을 놓치는 경우 대비: 인라인 보정
+        const nudgeRoots = [canvasClone, storyClone, el].filter(Boolean);
+        const nudgeSel = [
+          '.pv-main-copy', '.pv-sub-copy', '.pv-corp-badge',
+          '.pv-heading', '.pv-body', '.pv-sec-label', '.pv-info-val',
+          '.pv-apply-title', '.pv-apply-url', '.pv-apply-flow',
+          '.pv-proc-title', '.pv-proc-item-txt', '.pv-note',
+          '.pv-sched-title', '.pv-sched-val',
+          '.pv-hire-intro', '.pv-hire-logo-fallback',
+          '.pv-dept-cat', '.pv-dept-title', '.pv-dept-eng', '.pv-dept-tasks', '.pv-dept-team',
+          '.pv-dept-table thead th',
+          '.pv-s05-eco-body', '.pv-s05-h', '.pv-s05-sub', '.pv-s05-note',
+          '.pv-stat-label', '.pv-stat-val',
+          '.pv-award-title', '.pv-award-desc',
+          '.pv-principle-text h4', '.pv-principle-text p',
+          '.pv-work-copy h4', '.pv-work-copy p',
+          '.pv-benefit-label', '.pv-benefit-item-title',
+          '.pv-benefit-item > p:not(.pv-benefit-item-title)',
+          '.pv-empty', '.pv-ig-main', '.pv-ig-sub'
+        ].join(',');
+        const seen = new Set();
+        nudgeRoots.forEach(root => {
+          root.querySelectorAll(nudgeSel).forEach(node => {
+            if (seen.has(node)) return;
+            if (node.tagName === 'IMG' || node.getAttribute('data-vcenter-raster') || node.getAttribute('data-gradient-raster')) return;
+            seen.add(node);
+            const view = clonedDoc.defaultView || window;
+            const fs = parseFloat(view.getComputedStyle(node).fontSize) || 16;
+            const dy = -(fs * 0.1);
+            node.style.transform = `translateY(${dy}px)`;
+          });
+        });
       }
     });
 
