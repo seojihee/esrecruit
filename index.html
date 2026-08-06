@@ -169,8 +169,15 @@
     .dept-row-card.is-dragging { opacity: .45; }
     .dept-row-card.is-drag-over { border-top-color: var(--ui-brand); background: var(--ui-brand-soft); }
     .dept-row-top {
-      display: grid; grid-template-columns: 28px 1fr minmax(120px, 0.9fr) 34px;
+      display: grid; grid-template-columns: 28px 1fr minmax(120px, 0.9fr) auto;
       gap: 8px; align-items: center;
+    }
+    .dept-row-actions {
+      display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
+    }
+    .dept-row-actions .proc-icon-btn img,
+    .dept-row-actions .proc-icon-btn svg {
+      display: block; width: 14px; height: 14px;
     }
 
     /* ── Download button ── */
@@ -331,19 +338,36 @@
       justify-content: space-between; gap: 10px; width: 100%;
     }
     .pv-proc-item {
-      /* html2canvas는 flex align-items:center를 자주 깨뜨림 → table-cell */
-      flex: 1 1 0; min-width: 0;
-      display: table; box-sizing: border-box;
-      /* 고정 height 금지 — 긴 텍스트는 2줄로 자연 확장 */
-      min-height: 73px; height: auto;
-      background: #f7f8fa; border-radius: 10px;
-      font-size: 22px; font-weight: 600; color: #1e3a47;
+      /*
+        근본 원인: display:table 은 콘텐츠 폭으로 칸이 늘어나
+        '직무적합성면접' 같은 긴 한글이 한 줄로 남고 박스 너비가 제각각이 됨.
+        flex + min-width:0 으로 칸 폭을 고정한 뒤 텍스트만 줄바꿈한다.
+      */
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      min-height: 73px;
+      height: auto;
+      background: #f7f8fa;
+      border-radius: 10px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #1e3a47;
     }
     .pv-proc-item-txt {
-      display: table-cell; vertical-align: middle; text-align: center;
-      padding: 12px 12px; box-sizing: border-box;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 10px;
+      text-align: center;
       line-height: 1.35;
-      word-break: keep-all; overflow-wrap: break-word; white-space: normal;
+      /* keep-all만 쓰면 붙여 쓴 한글은 줄바꿈되지 않음 → anywhere로 강제 */
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      white-space: normal;
     }
     /* Figma ic_process (37:711) */
     .pv-proc-dots {
@@ -362,20 +386,42 @@
     }
     .pv-sched-list { width: 100%; display: flex; flex-direction: column; }
     .pv-sched-row {
-      display: flex; align-items: center; gap: 20px;
-      /* 고정 행 높이 + flex center로 칸 중앙 배치 (광학 translate 없음) */
-      height: 88px; padding: 0; box-sizing: border-box;
-      border-top: 1px solid #ced4da; border-bottom: 1px solid #ced4da; margin-top: -1px;
+      /*
+        근본 원인: flex + width:140px 만으로는 min-width:auto 때문에
+        제목 글자 수에 따라 열이 늘어나 날짜 시작 x가 행마다 어긋남.
+        grid 고정 컬럼으로 왼쪽/오른쪽 열을 강제한다.
+      */
+      display: grid;
+      grid-template-columns: 168px minmax(0, 1fr);
+      column-gap: 24px;
+      align-items: center;
+      height: 88px;
+      padding: 0;
+      box-sizing: border-box;
+      border-top: 1px solid #ced4da;
+      border-bottom: 1px solid #ced4da;
+      margin-top: -1px;
     }
     .pv-sched-title {
-      width: 140px; flex-shrink: 0; font-size: 24px; font-weight: 700;
-      letter-spacing: -.24px; color: #1e3a47; line-height: 1.2;
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -.24px;
+      color: #1e3a47;
+      line-height: 1.2;
+      min-width: 0;
       transform: none;
     }
     .pv-sched-val {
-      flex: 1; font-size: 28px; font-weight: 500; color: #1e3a47; line-height: 1.2; word-break: keep-all;
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
+      font-size: 28px;
+      font-weight: 500;
+      color: #1e3a47;
+      line-height: 1.2;
+      word-break: keep-all;
+      min-width: 0;
       transform: none;
     }
 
@@ -400,8 +446,17 @@
     .pv-dept-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .pv-dept-table thead th {
       background: #f7f8fa; color: #1e3a47; font-size: 22px; font-weight: 700;
-      text-align: left; padding: 20px 16px; border: none; border-bottom: 1px solid #ced4da;
-      line-height: 1.4; vertical-align: middle;
+      text-align: left; border: none; border-bottom: 1px solid #ced4da;
+      /*
+        처짐 원인: line-height>1 반여백 + 과도한 상하 패딩이 겹치면
+        한글 글리프가 회색 바 하단으로 내려가 보인다.
+        고정 높이 + line-height:1 + 동일 패딩으로 기하 중앙만 사용.
+      */
+      height: 64px;
+      padding: 0 16px;
+      line-height: 1;
+      vertical-align: middle;
+      box-sizing: border-box;
     }
     .pv-dept-table tbody td {
       /* 상·하 동일 패딩 — 하단만 키우면 텍스트가 아래로 처져 보임 */
@@ -704,95 +759,31 @@
     }
 
     /*
-      html2canvas Hangul 보정:
-      - 칩/전형제목/복지아이콘행 → JS 래스터화로 광학 중앙 고정
-      - 전형일정 → 동일 패딩 유지 + 미리보기와 같은 translateY 유지
-      - 그 외 순수 텍스트 → translateY 보정
+      캡처 시 레이아웃만 고정. translateY 일괄 보정은 쓰지 않음.
+      (미리보기는 OK인데 추출만 틀어지는 주원인 = 캡처 전용 transform 덮어쓰기)
+      깨지기 쉬운 박스/행은 JS 래스터화로 픽셀 고정.
     */
-    #preview-canvas.is-capturing,
-    .pv-ig-story.is-capturing {
-      --capture-text-nudge: -0.1em;
-    }
     #preview-canvas.is-capturing .pv-dept-table thead th {
-      padding: 20px 16px;
-      transform: none !important;
+      height: 64px !important;
+      padding: 0 16px !important;
+      line-height: 1 !important;
+      vertical-align: middle !important;
     }
     #preview-canvas.is-capturing .pv-dept-table tbody td {
       padding: 22px 16px !important;
-      transform: none !important;
       vertical-align: top;
-    }
-    #preview-canvas.is-capturing .pv-dept-cat,
-    #preview-canvas.is-capturing .pv-dept-title,
-    #preview-canvas.is-capturing .pv-dept-eng,
-    #preview-canvas.is-capturing .pv-dept-tasks,
-    #preview-canvas.is-capturing .pv-dept-team,
-    #preview-canvas.is-capturing .pv-dept-cat-cell,
-    #preview-canvas.is-capturing .pv-dept-job,
-    #preview-canvas.is-capturing .pv-dept-body {
-      transform: none !important;
     }
     #preview-canvas.is-capturing .pv-stat-card {
       padding-bottom: 14px;
       box-sizing: border-box;
     }
-    #preview-canvas.is-capturing .pv-stat-label,
-    #preview-canvas.is-capturing .pv-stat-val {
-      transform: none !important;
-    }
-    /* 전형일정: 고정 행 높이 + flex center (광학 translate 없음) */
     #preview-canvas.is-capturing .pv-sched-row {
+      display: grid !important;
+      grid-template-columns: 168px minmax(0, 1fr) !important;
+      column-gap: 24px !important;
       height: 88px !important;
       padding: 0 !important;
       align-items: center;
-    }
-    #preview-canvas.is-capturing .pv-sched-title,
-    #preview-canvas.is-capturing .pv-sched-val {
-      transform: none !important;
-      padding: 0 !important;
-    }
-    /* 복지: 미리보기와 동일 — transform 강제 금지(line-height:1 + flex center) */
-    #preview-canvas.is-capturing .pv-benefit-item-title img,
-    #preview-canvas.is-capturing .pv-benefit-title-txt {
-      transform: none !important;
-    }
-    #preview-canvas.is-capturing .pv-proc-title {
-      transform: translateY(-0.12em) !important;
-    }
-    #preview-canvas.is-capturing :is(
-      .pv-main-copy,
-      .pv-sub-copy,
-      .pv-corp-badge,
-      .pv-heading,
-      .pv-body,
-      .pv-sec-label,
-      .pv-info-val,
-      .pv-apply-title,
-      .pv-apply-url,
-      .pv-apply-flow,
-      .pv-proc-item-txt,
-      .pv-note,
-      .pv-hire-intro,
-      .pv-hire-logo-fallback,
-      .pv-s05-eco-body,
-      .pv-s05-h,
-      .pv-s05-sub,
-      .pv-s05-note,
-      .pv-award-title,
-      .pv-award-desc,
-      .pv-principle-text h4,
-      .pv-principle-text p,
-      .pv-work-copy h4,
-      .pv-work-copy p,
-      .pv-benefit-label,
-      .pv-benefit-item > p:not(.pv-benefit-item-title),
-      .pv-empty
-    ),
-    .pv-ig-story.is-capturing :is(
-      .pv-ig-main,
-      .pv-ig-sub
-    ) {
-      transform: translateY(var(--capture-text-nudge));
     }
   </style>
 </head>
@@ -2013,7 +2004,7 @@ function buildStep3() {
 <div class="space-y-5">
   <div>
     <h1 class="text-xl font-extrabold text-gray-900 mb-0.5">STEP 3. 모집부문</h1>
-    <p class="text-sm text-gray-400">채용 법인을 선택한 뒤, 직무 정보를 입력해 주세요. ⠿ 핸들로 순서를 변경할 수 있습니다.</p>
+    <p class="text-sm text-gray-400">채용 법인을 선택한 뒤, 직무 정보를 입력해 주세요. 직무는 복사·드래그로 빠르게 추가할 수 있습니다.</p>
   </div>
 
   <div id="hire-groups" data-preview-target="#preview-corp-table">${buildHiringGroupsEditor()}</div>
@@ -2028,7 +2019,7 @@ function buildStep3() {
       <span style="font-size:16px;">💡</span>
       <div class="text-xs text-yellow-700">
         <p class="font-bold mb-0.5">입력 팁</p>
-        <p>법인 선택 시 소개 문구가 자동으로 채워집니다. 소개는 수정할 수 있고, 모집팀은 선택 입력입니다. 법인·직무 왼쪽의 ⠿ 핸들을 드래그하면 순서를 바꿀 수 있습니다.</p>
+        <p>법인 선택 시 소개 문구가 자동으로 채워집니다. 소개는 수정할 수 있고, 모집팀은 선택 입력입니다. 직무 행의 복사 버튼으로 복제하고, ⠿ 핸들로 순서를 바꿀 수 있습니다.</p>
       </div>
     </div>
   </div>
@@ -2099,8 +2090,14 @@ function buildDeptRow(d, gi, di) {
         onchange="updateDept(${gi},${di},'chip',this.value)" title="계약형태 칩">
         ${buildProcChipOptions(d.chip || 'regular')}
       </select>
-      <button type="button" onclick="removeDept(${gi},${di})"
-        class="proc-icon-btn is-danger" title="삭제">×</button>
+      <div class="dept-row-actions">
+        <button type="button" onclick="duplicateDept(${gi},${di})"
+          class="proc-icon-btn" title="직무 복사" aria-label="직무 복사">
+          <img src="assets/ic-copy.svg" width="14" height="14" alt="" />
+        </button>
+        <button type="button" onclick="removeDept(${gi},${di})"
+          class="proc-icon-btn is-danger" title="삭제" aria-label="삭제">×</button>
+      </div>
     </div>
     <textarea placeholder="직무명&#10;영문명 (선택)" rows="2"
       class="f-textarea" style="font-size:12px;padding:7px 8px;"
@@ -2162,6 +2159,14 @@ function addDept(gi) {
   if (!group) return;
   if (!Array.isArray(group.departments)) group.departments = [];
   group.departments.push(makeDeptRowData());
+  refreshHiringGroupsEditor();
+}
+
+function duplicateDept(gi, di) {
+  const group = S.hiringGroups[gi];
+  if (!group || !Array.isArray(group.departments) || !group.departments[di]) return;
+  const copy = normalizeDeptRow(group.departments[di]);
+  group.departments.splice(di + 1, 0, copy);
   refreshHiringGroupsEditor();
 }
 
@@ -2917,9 +2922,7 @@ function rasterizeGradientTextForCapture(root) {
   return () => { restorers.forEach(fn => { try { fn(); } catch (_) {} }); };
 }
 
-/** 수직 중앙 텍스트 박스(배지/칩/전형제목) — html2canvas flex/line-height 깨짐 방지용 래스터화
- *  주의: .pv-proc-item 은 긴 텍스트 2줄 줄바꿈이 필요하므로 여기서 래스터화하지 않는다.
- */
+/** 수직 중앙 텍스트 박스(배지/칩/전형제목) — html2canvas flex/line-height 깨짐 방지용 래스터화 */
 function rasterizeVCenterBoxesForCapture(root) {
   const selectors = [
     '.pv-badge',
@@ -3004,13 +3007,10 @@ function rasterizeVCenterBoxesForCapture(root) {
     img.width = w;
     img.height = h;
     img.setAttribute('data-vcenter-raster', '1');
-    img.style.cssText = `display:inline-block;width:${w}px;height:${h}px;margin:0;padding:0;border:0;vertical-align:middle;flex-shrink:0;`;
-    if (el.classList.contains('pv-badge') || el.classList.contains('pv-ig-badge')) {
+    img.style.cssText = `display:inline-block;width:${w}px;height:${h}px;margin:0;padding:0;border:0;vertical-align:middle;flex-shrink:0;transform:none;`;
+    if (el.classList.contains('pv-badge') || el.classList.contains('pv-ig-badge') ||
+        el.classList.contains('pv-proc-chip') || el.classList.contains('pv-dept-chip')) {
       img.style.borderRadius = cs.borderRadius;
-    } else if (el.classList.contains('pv-proc-chip') || el.classList.contains('pv-dept-chip')) {
-      img.style.borderRadius = cs.borderRadius;
-    } else if (el.classList.contains('pv-proc-title')) {
-      img.style.transform = 'none';
     }
 
     const parent = el.parentNode;
@@ -3021,6 +3021,213 @@ function rasterizeVCenterBoxesForCapture(root) {
       if (img.parentNode === parent) parent.replaceChild(el, img);
       else if (next && next.parentNode === parent) parent.insertBefore(el, next);
       else parent.appendChild(el);
+    });
+  });
+
+  return () => { restorers.forEach(fn => { try { fn(); } catch (_) {} }); };
+}
+
+/** 한글 줄바꿈 (붙여쓴 단어도 maxWidth에서 끊음) */
+function wrapCanvasText(ctx, text, maxWidth) {
+  const chars = Array.from(String(text || ''));
+  const lines = [];
+  let line = '';
+  chars.forEach(ch => {
+    const test = line + ch;
+    if (line && ctx.measureText(test).width > maxWidth) {
+      lines.push(line);
+      line = ch;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  return lines.length ? lines : [''];
+}
+
+/**
+ * 미리보기는 OK인데 html2canvas만 깨는 레이아웃 텍스트를 픽셀로 고정.
+ * - 전형단계(줄바꿈 포함)
+ * - 전형일정 행(제목/날짜 열 정렬)
+ * - 모집부문 표 헤더
+ */
+function rasterizeExportLayoutTextForCapture(root) {
+  const restorers = [];
+
+  function replaceWithImg(el, img) {
+    const parent = el.parentNode;
+    if (!parent) return;
+    const next = el.nextSibling;
+    parent.replaceChild(img, el);
+    restorers.push(() => {
+      if (img.parentNode === parent) parent.replaceChild(el, img);
+      else if (next && next.parentNode === parent) parent.insertBefore(el, next);
+      else parent.appendChild(el);
+    });
+  }
+
+  // 1) 전형단계 박스 — 줄바꿈 + 광학 중앙
+  root.querySelectorAll('.pv-proc-item').forEach(el => {
+    const cs = getComputedStyle(el);
+    const txtEl = el.querySelector('.pv-proc-item-txt') || el;
+    const txtCs = getComputedStyle(txtEl);
+    const w = Math.ceil(el.offsetWidth);
+    const h = Math.max(73, Math.ceil(el.offsetHeight));
+    if (!w || !h) return;
+
+    const scale = 2;
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, w * scale);
+    c.height = Math.max(1, h * scale);
+    const ctx = c.getContext('2d');
+    ctx.scale(scale, scale);
+
+    const radius = parseFloat((cs.borderRadius || '10').split(' ')[0]) || 10;
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.arcTo(w, 0, w, h, radius);
+    ctx.arcTo(w, h, 0, h, radius);
+    ctx.arcTo(0, h, 0, 0, radius);
+    ctx.arcTo(0, 0, w, 0, radius);
+    ctx.closePath();
+    ctx.fillStyle = cs.backgroundColor || '#f7f8fa';
+    ctx.fill();
+
+    const fontSize = parseFloat(txtCs.fontSize) || 22;
+    const lineHeight = (parseFloat(txtCs.lineHeight) || fontSize * 1.35);
+    const padX = 10;
+    const maxTextW = Math.max(8, w - padX * 2);
+    ctx.font = `${txtCs.fontWeight || '600'} ${fontSize}px ${txtCs.fontFamily || cs.fontFamily}`;
+    ctx.fillStyle = txtCs.color || '#1e3a47';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+
+    const text = String(txtEl.innerText || '').replace(/\s+/g, ' ').trim();
+    const lines = wrapCanvasText(ctx, text, maxTextW);
+    const sample = ctx.measureText(lines[0] || '가');
+    const ascent = sample.actualBoundingBoxAscent || fontSize * 0.8;
+    const descent = sample.actualBoundingBoxDescent || fontSize * 0.2;
+    const blockH = (lines.length - 1) * lineHeight + ascent + descent;
+    let baselineY = (h - blockH) / 2 + ascent;
+
+    lines.forEach(line => {
+      ctx.fillText(line, w / 2, baselineY);
+      baselineY += lineHeight;
+    });
+
+    const img = document.createElement('img');
+    img.src = c.toDataURL('image/png');
+    img.alt = text;
+    img.width = w;
+    img.height = h;
+    img.setAttribute('data-layout-raster', '1');
+    img.style.cssText = `display:block;flex:1 1 0;min-width:0;width:${w}px;height:${h}px;margin:0;padding:0;border:0;border-radius:${cs.borderRadius};`;
+    replaceWithImg(el, img);
+  });
+
+  // 2) 전형일정 행 — grid 열 위치를 픽셀로 고정
+  root.querySelectorAll('.pv-sched-row').forEach(el => {
+    const titleEl = el.querySelector('.pv-sched-title');
+    const valEl = el.querySelector('.pv-sched-val');
+    if (!titleEl || !valEl) return;
+    const w = Math.ceil(el.offsetWidth);
+    const h = Math.max(88, Math.ceil(el.offsetHeight));
+    if (!w || !h) return;
+
+    const scale = 2;
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, w * scale);
+    c.height = Math.max(1, h * scale);
+    const ctx = c.getContext('2d');
+    ctx.scale(scale, scale);
+
+    const colTitle = 168;
+    const gap = 24;
+    const title = String(titleEl.textContent || '').trim();
+    const val = String(valEl.textContent || '').trim();
+    const titleCs = getComputedStyle(titleEl);
+    const valCs = getComputedStyle(valEl);
+
+    function drawLeftText(text, cs, x, boxW) {
+      const fontSize = parseFloat(cs.fontSize) || 24;
+      ctx.font = `${cs.fontWeight || '700'} ${fontSize}px ${cs.fontFamily}`;
+      ctx.fillStyle = cs.color || '#1e3a47';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      const m = ctx.measureText(text || '가');
+      const ascent = m.actualBoundingBoxAscent || fontSize * 0.8;
+      const descent = m.actualBoundingBoxDescent || fontSize * 0.2;
+      const baselineY = h / 2 + (ascent - descent) / 2;
+      ctx.fillText(text, x, baselineY);
+    }
+
+    drawLeftText(title, titleCs, 0, colTitle);
+    drawLeftText(val, valCs, colTitle + gap, w - colTitle - gap);
+
+    const img = document.createElement('img');
+    img.src = c.toDataURL('image/png');
+    img.alt = `${title} ${val}`;
+    img.width = w;
+    img.height = h;
+    img.setAttribute('data-layout-raster', '1');
+    img.style.cssText = `display:block;width:${w}px;height:${h}px;margin:0;padding:0;border:0;`;
+    // 구분선은 원본 row border를 유지하기 위해 래스터 img를 row 안에 두고 row는 비우지 않고 교체
+    replaceWithImg(el, img);
+    // 구분선 복원
+    img.style.borderTop = '1px solid #ced4da';
+    img.style.borderBottom = '1px solid #ced4da';
+    img.style.marginTop = '-1px';
+    img.style.boxSizing = 'border-box';
+  });
+
+  // 3) 모집부문 표 헤더 — 고정 높이 광학 중앙
+  root.querySelectorAll('.pv-dept-table thead th').forEach(el => {
+    const cs = getComputedStyle(el);
+    const w = Math.ceil(el.offsetWidth);
+    const h = 64;
+    if (!w) return;
+
+    const scale = 2;
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, w * scale);
+    c.height = Math.max(1, h * scale);
+    const ctx = c.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.fillStyle = cs.backgroundColor || '#f7f8fa';
+    ctx.fillRect(0, 0, w, h);
+
+    const text = String(el.innerText || '').replace(/\s+/g, ' ').trim();
+    const fontSize = parseFloat(cs.fontSize) || 22;
+    ctx.font = `${cs.fontWeight || '700'} ${fontSize}px ${cs.fontFamily}`;
+    ctx.fillStyle = cs.color || '#1e3a47';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    const m = ctx.measureText(text || '가');
+    const ascent = m.actualBoundingBoxAscent || fontSize * 0.8;
+    const descent = m.actualBoundingBoxDescent || fontSize * 0.2;
+    const baselineY = h / 2 + (ascent - descent) / 2;
+    ctx.fillText(text, 16, baselineY);
+
+    const img = document.createElement('img');
+    img.src = c.toDataURL('image/png');
+    img.alt = text;
+    img.width = w;
+    img.height = h;
+    img.setAttribute('data-layout-raster', '1');
+    img.style.cssText = `display:block;width:100%;height:${h}px;margin:0;padding:0;border:0;`;
+    // th 내용은 비우고 이미지로 대체 (th 셀은 유지해 표 구조 보존)
+    const keep = el;
+    const oldHTML = keep.innerHTML;
+    keep.innerHTML = '';
+    keep.style.padding = '0';
+    keep.style.height = `${h}px`;
+    keep.style.verticalAlign = 'middle';
+    keep.appendChild(img);
+    restorers.push(() => {
+      keep.innerHTML = oldHTML;
+      keep.style.padding = '';
+      keep.style.height = '';
+      keep.style.verticalAlign = '';
     });
   });
 
@@ -3132,6 +3339,7 @@ async function downloadImage() {
   let restoreGradientText = null;
   let restoreVCenterBoxes = null;
   let restoreBenefitTitles = null;
+  let restoreLayoutText = null;
   try {
     // 이미지 로드 완료 대기 (미로드 시 캡처 실패/빈 이미지 방지)
     const imgs = Array.from(canvas.querySelectorAll('img'));
@@ -3150,16 +3358,17 @@ async function downloadImage() {
     }
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-    // 복지 아이콘+제목: 아이콘과 한글 광학 중앙을 한 이미지로 고정
+    // 복지 아이콘+제목
     restoreBenefitTitles = rasterizeBenefitTitlesForCapture(canvas);
-    // 배지/칩/전형제목: 수직 중앙 텍스트를 캔버스로 고정 (한글 하단 처짐 방지)
-    // 전형단계(.pv-proc-item)는 2줄 줄바꿈을 위해 래스터화하지 않음
+    // 배지/칩/전형제목
     restoreVCenterBoxes = rasterizeVCenterBoxesForCapture(canvas);
-    // background-clip:text → 래스터 이미지로 치환 (추출 시 그라데이션 박스 버그 방지)
+    // 전형단계·전형일정·표헤더 (미리보기=추출 정렬 일치)
+    restoreLayoutText = rasterizeExportLayoutTextForCapture(canvas);
+    // background-clip:text
     restoreGradientText = rasterizeGradientTextForCapture(canvas);
     await Promise.all(
       Array.from(canvas.querySelectorAll(
-        'img[data-gradient-raster="1"], img[data-vcenter-raster="1"], img[data-benefit-raster="1"]'
+        'img[data-gradient-raster="1"], img[data-vcenter-raster="1"], img[data-benefit-raster="1"], img[data-layout-raster="1"]'
       )).map(img => {
         if (img.complete && img.naturalWidth > 0) return Promise.resolve();
         return img.decode ? img.decode().catch(() => {}) : new Promise(r => {
@@ -3219,6 +3428,7 @@ async function downloadImage() {
     }
 
     function applyCaptureClone(clonedDoc, el) {
+      // 레이아웃 CSS(.is-capturing)만 적용. translateY 일괄 보정 금지.
       el.classList.add('is-capturing');
       el.style.overflow = 'visible';
       const canvasClone = clonedDoc.getElementById('preview-canvas');
@@ -3229,64 +3439,6 @@ async function downloadImage() {
       }
       const storyClone = clonedDoc.querySelector('.pv-ig-story');
       if (storyClone) storyClone.classList.add('is-capturing');
-
-      const nudgeRoots = [canvasClone, storyClone, el].filter(Boolean);
-      const nudgeSel = [
-        '.pv-main-copy', '.pv-sub-copy', '.pv-corp-badge',
-        '.pv-heading', '.pv-body', '.pv-sec-label', '.pv-info-val',
-        '.pv-apply-title', '.pv-apply-url', '.pv-apply-flow',
-        '.pv-proc-item-txt', '.pv-note',
-        '.pv-hire-intro', '.pv-hire-logo-fallback',
-        '.pv-s05-eco-body', '.pv-s05-h', '.pv-s05-sub', '.pv-s05-note',
-        '.pv-award-title', '.pv-award-desc',
-        '.pv-principle-text h4', '.pv-principle-text p',
-        '.pv-work-copy h4', '.pv-work-copy p',
-        '.pv-benefit-label',
-        '.pv-benefit-item > p:not(.pv-benefit-item-title)',
-        '.pv-empty', '.pv-ig-main', '.pv-ig-sub'
-      ].join(',');
-      const seen = new Set();
-      nudgeRoots.forEach(root => {
-        root.querySelectorAll(
-          '.pv-dept-table thead th, .pv-dept-cat, .pv-dept-title, .pv-dept-eng, .pv-dept-tasks, .pv-dept-team, .pv-stat-label, .pv-stat-val'
-        ).forEach(node => {
-          node.style.transform = 'none';
-        });
-        root.querySelectorAll('.pv-dept-table tbody td').forEach(node => {
-          node.style.verticalAlign = 'top';
-          node.style.transform = 'none';
-          node.style.padding = '22px 16px';
-        });
-        root.querySelectorAll('.pv-stat-card').forEach(node => {
-          node.style.paddingBottom = '14px';
-          node.style.boxSizing = 'border-box';
-        });
-        root.querySelectorAll('.pv-dept-table thead th').forEach(node => {
-          node.style.padding = '20px 16px';
-        });
-        root.querySelectorAll('.pv-sched-row').forEach(node => {
-          node.style.height = '88px';
-          node.style.padding = '0';
-          node.style.alignItems = 'center';
-        });
-        root.querySelectorAll('.pv-sched-title, .pv-sched-val').forEach(node => {
-          node.style.padding = '0';
-          node.style.transform = 'none';
-        });
-        root.querySelectorAll(nudgeSel).forEach(node => {
-          if (seen.has(node)) return;
-          if (
-            node.tagName === 'IMG' ||
-            node.getAttribute('data-vcenter-raster') ||
-            node.getAttribute('data-gradient-raster') ||
-            node.getAttribute('data-benefit-raster')
-          ) return;
-          seen.add(node);
-          const view = clonedDoc.defaultView || window;
-          const fs = parseFloat(view.getComputedStyle(node).fontSize) || 16;
-          node.style.transform = `translateY(${-(fs * 0.1)}px)`;
-        });
-      });
     }
 
     const baseOpts = {
@@ -3408,6 +3560,7 @@ async function downloadImage() {
     if (typeof restoreGradientText === 'function') restoreGradientText();
     if (typeof restoreVCenterBoxes === 'function') restoreVCenterBoxes();
     if (typeof restoreBenefitTitles === 'function') restoreBenefitTitles();
+    if (typeof restoreLayoutText === 'function') restoreLayoutText();
     if (wasStoryScaled) {
       canvas.classList.remove('is-story-capture');
       canvas.classList.add('is-story');

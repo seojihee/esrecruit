@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+  <!-- back square -->
+  <rect x="5.25" y="5.25" width="8.5" height="8.5" rx="1.75" stroke="#94A3B8" stroke-width="1.25" fill="none"/>
+  <!-- front square -->
+  <rect x="2.25" y="2.25" width="8.5" height="8.5" rx="1.75" stroke="#94A3B8" stroke-width="1.25" fill="none"/>
+</svg>
