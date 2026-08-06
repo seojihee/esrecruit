@@ -146,8 +146,15 @@
     /* ── Dept / hiring form ── */
     .hire-group-card {
       border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; overflow: hidden;
+      border-top: 2px solid transparent;
+      transition: opacity .12s, border-color .12s, box-shadow .12s;
     }
     .hire-group-card + .hire-group-card { margin-top: 14px; }
+    .hire-group-card.is-dragging { opacity: .45; }
+    .hire-group-card.is-drag-over {
+      border-top-color: var(--ui-brand);
+      box-shadow: 0 0 0 2px var(--ui-brand-soft);
+    }
     .hire-group-head {
       padding: 14px; background: #f8fafc; border-bottom: 1px solid #eef2f7;
       display: flex; flex-direction: column; gap: 10px;
@@ -155,10 +162,14 @@
     .dept-row-card {
       padding: 12px 14px; border-bottom: 1px solid #f1f5f9;
       display: flex; flex-direction: column; gap: 8px;
+      border-top: 2px solid transparent;
+      transition: background .12s, border-color .12s, opacity .12s;
     }
     .dept-row-card:last-child { border-bottom: none; }
+    .dept-row-card.is-dragging { opacity: .45; }
+    .dept-row-card.is-drag-over { border-top-color: var(--ui-brand); background: var(--ui-brand-soft); }
     .dept-row-top {
-      display: grid; grid-template-columns: 1fr minmax(120px, 0.9fr) 34px;
+      display: grid; grid-template-columns: 28px 1fr minmax(120px, 0.9fr) 34px;
       gap: 8px; align-items: center;
     }
 
@@ -295,8 +306,10 @@
     .pv-proc-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .pv-proc-title {
       margin: 0; font-size: 26px; font-weight: 700; color: #1e3a47;
-      /* 칩(28px)과 동일 높이로 수직 중앙 맞춤 */
-      height: 28px; line-height: 28px; display: flex; align-items: center;
+      height: 28px; line-height: 28px;
+      display: inline-flex; align-items: center;
+      /* 한글 글리프가 줄박스 하단에 붙는 광학 처짐 보정 — 칩과 맞춤 */
+      transform: translateY(-0.12em);
     }
     /* Figma chip_계약형태 (265:726) */
     .pv-proc-chip {
@@ -348,18 +361,22 @@
     }
     .pv-sched-list { width: 100%; display: flex; flex-direction: column; }
     .pv-sched-row {
-      display: flex; align-items: center; gap: 20px; min-height: 90px;
-      padding: 24px 0; box-sizing: border-box;
+      display: flex; align-items: center; gap: 20px;
+      /* 위·아래 동일 패딩 */
+      padding: 28px 0; box-sizing: border-box;
       border-top: 1px solid #ced4da; border-bottom: 1px solid #ced4da; margin-top: -1px;
     }
     .pv-sched-title {
       width: 140px; flex-shrink: 0; font-size: 24px; font-weight: 700;
-      letter-spacing: -.24px; color: #1e3a47; line-height: 1.4;
+      letter-spacing: -.24px; color: #1e3a47; line-height: 1.3;
       margin: 0; padding: 0;
+      /* 한글 광학 중앙 — 패딩은 동일, 글리프만 살짝 위로 */
+      transform: translateY(-0.06em);
     }
     .pv-sched-val {
-      flex: 1; font-size: 28px; font-weight: 500; color: #1e3a47; line-height: 1.4; word-break: keep-all;
+      flex: 1; font-size: 28px; font-weight: 500; color: #1e3a47; line-height: 1.3; word-break: keep-all;
       margin: 0; padding: 0;
+      transform: translateY(-0.06em);
     }
 
     /* ── Section 04: 모집부문 ── */
@@ -560,26 +577,52 @@
     }
     .pv-benefit-items { flex: 1; display: flex; flex-direction: column; gap: 26px; }
     .pv-benefit-item { display: flex; flex-direction: column; gap: 12px; }
+    /*
+      복지 아이콘+제목 정렬
+      - 원인: 제목 line-height를 아이콘 높이(30)와 같게 강제하면
+        한글 글리프가 줄박스 안에서 아래로 처져 아이콘만 위로 떠 보인다.
+      - 해결: 제목 line-height:1로 글리프 박스에 맞추고 flex center.
+    */
     .pv-benefit-item-title {
-      display: flex; align-items: center; gap: 12px;
-      margin: 0; min-height: 30px;
-      font-size: 22px; font-weight: 700; color: #1e3a47;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      min-height: 30px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e3a47;
+      line-height: 1;
     }
     .pv-benefit-item-title img {
-      display: block; width: 30px; height: 30px; flex-shrink: 0;
-      object-fit: contain; object-position: center;
+      display: block;
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      object-fit: contain;
+      object-position: center;
+      transform: none;
     }
     .pv-benefit-title-txt {
-      /* 아이콘(30px)과 동일 박스 높이 + 한글 광학 보정 */
       display: block;
-      height: 30px; line-height: 30px;
-      font-size: 22px; font-weight: 700; color: #1e3a47;
-      margin: 0; padding: 0;
-      position: relative; top: -2px;
+      margin: 0;
+      padding: 0;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+      color: #1e3a47;
+      transform: none;
     }
     .pv-benefit-item > p:not(.pv-benefit-item-title) {
-      margin: 0; font-size: 20px; font-weight: 400; line-height: 1.75; color: #1e3a47;
-      word-break: keep-all; white-space: pre-wrap;
+      margin: 0;
+      padding-left: 42px; /* 아이콘(30) + gap(12) */
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1.75;
+      color: #1e3a47;
+      word-break: keep-all;
+      white-space: pre-wrap;
+      box-sizing: border-box;
     }
     .pv-benefit-item > p:not(.pv-benefit-item-title) .sub { font-size: 16px; }
     .pv-benefit-divider {
@@ -660,22 +703,20 @@
     }
 
     /*
-      html2canvas Hangul 보정 전략:
-      - 순수 텍스트 블록: translateY로 광학 위치만 보정
-      - 표/카드/아이콘+텍스트: transform 금지 (계단·아이콘 어긋남 유발)
-        → padding / line-height로 박스 안에서만 보정
+      html2canvas Hangul 보정:
+      - 칩/전형제목/복지아이콘행 → JS 래스터화로 광학 중앙 고정
+      - 전형일정 → 동일 패딩 유지 + 미리보기와 같은 translateY 유지
+      - 그 외 순수 텍스트 → translateY 보정
     */
     #preview-canvas.is-capturing,
     .pv-ig-story.is-capturing {
       --capture-text-nudge: -0.1em;
     }
-    /* 표 헤더: 박스 높이는 유지하고 패딩으로 광학 중앙 */
     #preview-canvas.is-capturing .pv-dept-table thead th {
       padding-top: 16px;
       padding-bottom: 24px;
       transform: none !important;
     }
-    /* 표 본문: 상단 정렬 유지, 하단 여백 유지, 개별 transform 금지 */
     #preview-canvas.is-capturing .pv-dept-table tbody td {
       padding: 16px 16px 28px !important;
       transform: none !important;
@@ -691,7 +732,6 @@
     #preview-canvas.is-capturing .pv-dept-body {
       transform: none !important;
     }
-    /* 성장과 규모 카드: flex 중앙 + 하단 패딩으로 텍스트를 박스 중앙에 */
     #preview-canvas.is-capturing .pv-stat-card {
       padding-bottom: 14px;
       box-sizing: border-box;
@@ -700,18 +740,23 @@
     #preview-canvas.is-capturing .pv-stat-val {
       transform: none !important;
     }
-    /* 전형절차 제목+칩 / 전형일정: 레이아웃으로 맞춤 — transform 금지 */
-    #preview-canvas.is-capturing .pv-proc-title,
-    #preview-canvas.is-capturing .pv-proc-head,
-    #preview-canvas.is-capturing .pv-sched-row,
+    /* 전형일정: 위·아래 패딩 동일 유지 (캡처에서 덮어쓰지 않음) */
+    #preview-canvas.is-capturing .pv-sched-row {
+      padding: 28px 0 !important;
+      align-items: center;
+    }
     #preview-canvas.is-capturing .pv-sched-title,
     #preview-canvas.is-capturing .pv-sched-val {
-      transform: none !important;
+      transform: translateY(-0.06em) !important;
+      padding: 0 !important;
     }
-    /* 복지 아이콘+제목: 동일 높이 박스 — transform 금지 */
-    #preview-canvas.is-capturing .pv-benefit-item-title,
+    /* 복지: 미리보기와 동일 — transform 강제 금지(line-height:1 + flex center) */
+    #preview-canvas.is-capturing .pv-benefit-item-title img,
     #preview-canvas.is-capturing .pv-benefit-title-txt {
       transform: none !important;
+    }
+    #preview-canvas.is-capturing .pv-proc-title {
+      transform: translateY(-0.12em) !important;
     }
     #preview-canvas.is-capturing :is(
       .pv-main-copy,
@@ -1967,7 +2012,7 @@ function buildStep3() {
 <div class="space-y-5">
   <div>
     <h1 class="text-xl font-extrabold text-gray-900 mb-0.5">STEP 3. 모집부문</h1>
-    <p class="text-sm text-gray-400">채용 법인을 선택한 뒤, 직무 정보를 입력해 주세요.</p>
+    <p class="text-sm text-gray-400">채용 법인을 선택한 뒤, 직무 정보를 입력해 주세요. ⠿ 핸들로 순서를 변경할 수 있습니다.</p>
   </div>
 
   <div id="hire-groups" data-preview-target="#preview-corp-table">${buildHiringGroupsEditor()}</div>
@@ -1982,7 +2027,7 @@ function buildStep3() {
       <span style="font-size:16px;">💡</span>
       <div class="text-xs text-yellow-700">
         <p class="font-bold mb-0.5">입력 팁</p>
-        <p>법인 선택 시 소개 문구가 자동으로 채워집니다. 소개는 수정할 수 있고, 모집팀은 선택 입력입니다.</p>
+        <p>법인 선택 시 소개 문구가 자동으로 채워집니다. 소개는 수정할 수 있고, 모집팀은 선택 입력입니다. 법인·직무 왼쪽의 ⠿ 핸들을 드래그하면 순서를 바꿀 수 있습니다.</p>
       </div>
     </div>
   </div>
@@ -2001,9 +2046,15 @@ function buildHiringGroupCard(g, gi) {
   const deptRows = (g.departments || []).map((d, di) => buildDeptRow(d, gi, di)).join('');
 
   return `
-  <div class="hire-group-card" data-group="${gi}">
+  <div class="hire-group-card" data-group="${gi}"
+    ondragover="onHiringGroupDragOver(event)"
+    ondragleave="onHiringGroupDragLeave(event)"
+    ondrop="onHiringGroupDrop(event,${gi})">
     <div class="hire-group-head">
       <div class="flex items-center gap-2">
+        <span class="proc-drag-handle" draggable="true" title="드래그하여 법인 순서 변경"
+          ondragstart="onHiringGroupDragStart(event,${gi})"
+          ondragend="onHiringGroupDragEnd(event)" aria-label="법인 순서 변경">⠿</span>
         <select class="f-input" style="flex:1;" onchange="changeHiringCorp(${gi},this.value)">
           ${buildCorpOptions(g.corpKey)}
         </select>
@@ -2032,8 +2083,14 @@ function buildHiringGroupCard(g, gi) {
 function buildDeptRow(d, gi, di) {
   const safe = htmlEsc;
   return `
-  <div class="dept-row-card" id="dr-${gi}-${di}">
+  <div class="dept-row-card" id="dr-${gi}-${di}" data-group="${gi}" data-dept="${di}"
+    ondragover="onDeptDragOver(event)"
+    ondragleave="onDeptDragLeave(event)"
+    ondrop="onDeptDrop(event,${gi},${di})">
     <div class="dept-row-top">
+      <span class="proc-drag-handle" draggable="true" title="드래그하여 직무 순서 변경"
+        ondragstart="onDeptDragStart(event,${gi},${di})"
+        ondragend="onDeptDragEnd(event)" aria-label="직무 순서 변경">⠿</span>
       <input type="text" placeholder="채용분류 (예: 신입,인턴,경력)" value="${safe(d.category||'')}"
         class="f-input" style="font-size:12px;padding:7px 8px;"
         oninput="updateDept(${gi},${di},'category',this.value)" />
@@ -2120,6 +2177,115 @@ function updateDept(gi, di, field, val) {
   group.departments[di][field] = val;
   renderPreview();
   scheduleAutoSave();
+}
+
+// ─── STEP 3 drag reorder ───
+let _deptDrag = null; // { gi, di }
+let _hireGroupDrag = null; // gi
+
+function moveArrayItem(arr, from, to) {
+  if (!Array.isArray(arr) || from === to) return false;
+  if (from < 0 || to < 0 || from >= arr.length || to >= arr.length) return false;
+  const [item] = arr.splice(from, 1);
+  arr.splice(to, 0, item);
+  return true;
+}
+
+function onDeptDragStart(e, gi, di) {
+  _deptDrag = { gi, di };
+  _hireGroupDrag = null;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', `dept:${gi}:${di}`);
+  const row = e.currentTarget && e.currentTarget.closest
+    ? e.currentTarget.closest('.dept-row-card')
+    : null;
+  if (row) row.classList.add('is-dragging');
+}
+
+function onDeptDragOver(e) {
+  if (!_deptDrag) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const row = e.currentTarget;
+  if (!(row instanceof HTMLElement)) return;
+  const gi = Number(row.getAttribute('data-group'));
+  if (gi !== _deptDrag.gi) return;
+  document.querySelectorAll('.dept-row-card.is-drag-over').forEach(el => {
+    if (el !== row) el.classList.remove('is-drag-over');
+  });
+  row.classList.add('is-drag-over');
+}
+
+function onDeptDragLeave(e) {
+  const row = e.currentTarget;
+  if (!(row instanceof HTMLElement)) return;
+  if (row.contains(e.relatedTarget)) return;
+  row.classList.remove('is-drag-over');
+}
+
+function onDeptDrop(e, gi, di) {
+  e.preventDefault();
+  const row = e.currentTarget;
+  if (row instanceof HTMLElement) row.classList.remove('is-drag-over');
+  if (!_deptDrag || _deptDrag.gi !== gi) return;
+  const from = _deptDrag.di;
+  _deptDrag = null;
+  const group = S.hiringGroups[gi];
+  if (!group || !moveArrayItem(group.departments, from, di)) return;
+  refreshHiringGroupsEditor();
+}
+
+function onDeptDragEnd() {
+  _deptDrag = null;
+  document.querySelectorAll('.dept-row-card.is-dragging, .dept-row-card.is-drag-over')
+    .forEach(el => el.classList.remove('is-dragging', 'is-drag-over'));
+}
+
+function onHiringGroupDragStart(e, gi) {
+  _hireGroupDrag = gi;
+  _deptDrag = null;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', `hire:${gi}`);
+  const card = e.currentTarget && e.currentTarget.closest
+    ? e.currentTarget.closest('.hire-group-card')
+    : null;
+  if (card) card.classList.add('is-dragging');
+}
+
+function onHiringGroupDragOver(e) {
+  if (_hireGroupDrag === null || _hireGroupDrag === undefined) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const card = e.currentTarget;
+  if (!(card instanceof HTMLElement)) return;
+  document.querySelectorAll('.hire-group-card.is-drag-over').forEach(el => {
+    if (el !== card) el.classList.remove('is-drag-over');
+  });
+  card.classList.add('is-drag-over');
+}
+
+function onHiringGroupDragLeave(e) {
+  const card = e.currentTarget;
+  if (!(card instanceof HTMLElement)) return;
+  if (card.contains(e.relatedTarget)) return;
+  card.classList.remove('is-drag-over');
+}
+
+function onHiringGroupDrop(e, gi) {
+  e.preventDefault();
+  const card = e.currentTarget;
+  if (card instanceof HTMLElement) card.classList.remove('is-drag-over');
+  if (_hireGroupDrag === null || _hireGroupDrag === undefined) return;
+  const from = _hireGroupDrag;
+  _hireGroupDrag = null;
+  if (!moveArrayItem(S.hiringGroups, from, gi)) return;
+  refreshHiringGroupsEditor();
+}
+
+function onHiringGroupDragEnd() {
+  _hireGroupDrag = null;
+  document.querySelectorAll('.hire-group-card.is-dragging, .hire-group-card.is-drag-over')
+    .forEach(el => el.classList.remove('is-dragging', 'is-drag-over'));
 }
 
 // ─── STEP 4 HTML ───
@@ -2750,13 +2916,14 @@ function rasterizeGradientTextForCapture(root) {
   return () => { restorers.forEach(fn => { try { fn(); } catch (_) {} }); };
 }
 
-/** 수직 중앙 텍스트 박스(배지/칩/전형단계) — html2canvas flex/line-height 깨짐 방지용 래스터화 */
+/** 수직 중앙 텍스트 박스(배지/칩/전형제목/전형단계) — html2canvas flex/line-height 깨짐 방지용 래스터화 */
 function rasterizeVCenterBoxesForCapture(root) {
   const selectors = [
     '.pv-badge',
     '.pv-ig-badge',
     '.pv-proc-chip',
     '.pv-dept-chip',
+    '.pv-proc-title',
     '.pv-proc-item'
   ];
   const nodes = Array.from(root.querySelectorAll(selectors.join(',')));
@@ -2804,7 +2971,6 @@ function rasterizeVCenterBoxesForCapture(root) {
     ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
     ctx.fillStyle = cs.color || '#1e3a47';
     ctx.textAlign = 'center';
-    // alphabetic + manual optical center works more consistently for Hangul than 'middle'
     ctx.textBaseline = 'alphabetic';
 
     const tracking = parseFloat(cs.letterSpacing) || 0;
@@ -2812,13 +2978,11 @@ function rasterizeVCenterBoxesForCapture(root) {
     const metrics = ctx.measureText(text || '가');
     const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
     const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
-    // 광학 중앙: 박스 중앙보다 약간 위(한글 descent 보정)
     const baselineY = h / 2 + (ascent - descent) / 2 - fontSize * 0.04;
 
     if (!tracking) {
       ctx.fillText(text, w / 2, baselineY);
     } else {
-      // letter-spacing: measure full width then draw from center
       let total = 0;
       const chars = Array.from(text);
       chars.forEach((ch, i) => {
@@ -2838,20 +3002,95 @@ function rasterizeVCenterBoxesForCapture(root) {
     img.width = w;
     img.height = h;
     img.setAttribute('data-vcenter-raster', '1');
-    img.style.cssText = `display:block;width:${w}px;height:${h}px;margin:0;padding:0;border:0;flex:${cs.flex || 'none'};flex-shrink:${cs.flexShrink || '0'};`;
-    // preserve flex-grow for proc-item
+    img.style.cssText = `display:inline-block;width:${w}px;height:${h}px;margin:0;padding:0;border:0;vertical-align:middle;flex-shrink:0;`;
     if (el.classList.contains('pv-proc-item')) {
+      img.style.display = 'block';
       img.style.flex = '1 1 0';
       img.style.minWidth = '0';
       img.style.borderRadius = cs.borderRadius;
     } else if (el.classList.contains('pv-badge') || el.classList.contains('pv-ig-badge')) {
-      img.style.display = 'inline-block';
       img.style.borderRadius = cs.borderRadius;
-    } else {
-      img.style.display = 'inline-block';
-      img.style.verticalAlign = 'middle';
+    } else if (el.classList.contains('pv-proc-chip') || el.classList.contains('pv-dept-chip')) {
       img.style.borderRadius = cs.borderRadius;
+    } else if (el.classList.contains('pv-proc-title')) {
+      img.style.transform = 'none';
     }
+
+    const parent = el.parentNode;
+    if (!parent) return;
+    const next = el.nextSibling;
+    parent.replaceChild(img, el);
+    restorers.push(() => {
+      if (img.parentNode === parent) parent.replaceChild(el, img);
+      else if (next && next.parentNode === parent) parent.insertBefore(el, next);
+      else parent.appendChild(el);
+    });
+  });
+
+  return () => { restorers.forEach(fn => { try { fn(); } catch (_) {} }); };
+}
+
+/**
+ * 복지 아이콘+제목 행 래스터화.
+ * 원인: CSS align-items:center여도 한글 글리프가 em박스 하단에 붙어
+ * 아이콘 대비 텍스트가 처져 보이고, html2canvas는 이 광학 차이를 더 키운다.
+ * 아이콘과 텍스트를 한 이미지로 그려 광학 중앙을 고정한다.
+ */
+function rasterizeBenefitTitlesForCapture(root) {
+  const nodes = Array.from(root.querySelectorAll('.pv-benefit-item-title'));
+  const restorers = [];
+
+  nodes.forEach(el => {
+    const icon = el.querySelector('img');
+    const txtEl = el.querySelector('.pv-benefit-title-txt');
+    const cs = getComputedStyle(el);
+    const w = Math.ceil(Math.max(el.offsetWidth, 200));
+    const h = 30;
+    if (!w) return;
+
+    const scale = 2;
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, w * scale);
+    c.height = Math.max(1, h * scale);
+    const ctx = c.getContext('2d');
+    ctx.scale(scale, scale);
+
+    const gap = 12;
+    const iconSize = 30;
+    // 아이콘: 행 기하 중앙 (미리보기 flex center와 동일)
+    if (icon) {
+      const iy = (h - iconSize) / 2;
+      try {
+        if (icon.complete && icon.naturalWidth > 0) {
+          ctx.drawImage(icon, 0, iy, iconSize, iconSize);
+        }
+      } catch (_) {}
+    }
+
+    const text = String((txtEl && txtEl.textContent) || el.innerText || '').replace(/\s+/g, ' ').trim();
+    const txtCs = txtEl ? getComputedStyle(txtEl) : cs;
+    const fontSize = parseFloat(txtCs.fontSize) || 22;
+    const fontWeight = txtCs.fontWeight || '700';
+    const fontFamily = txtCs.fontFamily || cs.fontFamily || "'SUIT', 'Noto Sans KR', sans-serif";
+    const color = txtCs.color || cs.color || '#1e3a47';
+    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    const metrics = ctx.measureText(text || '가');
+    const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
+    const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
+    // 글리프 광학 중앙 = 아이콘 기하 중앙
+    const baselineY = h / 2 + (ascent - descent) / 2;
+    ctx.fillText(text, iconSize + gap, baselineY);
+
+    const img = document.createElement('img');
+    img.src = c.toDataURL('image/png');
+    img.alt = text;
+    img.width = w;
+    img.height = h;
+    img.setAttribute('data-benefit-raster', '1');
+    img.style.cssText = `display:block;width:${w}px;height:${h}px;margin:0 0 0 0;padding:0;border:0;flex-shrink:0;`;
 
     const parent = el.parentNode;
     if (!parent) return;
@@ -2895,6 +3134,7 @@ async function downloadImage() {
 
   let restoreGradientText = null;
   let restoreVCenterBoxes = null;
+  let restoreBenefitTitles = null;
   try {
     // 이미지 로드 완료 대기 (미로드 시 캡처 실패/빈 이미지 방지)
     const imgs = Array.from(canvas.querySelectorAll('img'));
@@ -2913,12 +3153,16 @@ async function downloadImage() {
     }
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-    // 배지/칩/전형단계: 수직 중앙 텍스트를 캔버스로 고정 (한글 하단 처짐 방지)
+    // 복지 아이콘+제목: 아이콘과 한글 광학 중앙을 한 이미지로 고정
+    restoreBenefitTitles = rasterizeBenefitTitlesForCapture(canvas);
+    // 배지/칩/전형제목/전형단계: 수직 중앙 텍스트를 캔버스로 고정 (한글 하단 처짐 방지)
     restoreVCenterBoxes = rasterizeVCenterBoxesForCapture(canvas);
     // background-clip:text → 래스터 이미지로 치환 (추출 시 그라데이션 박스 버그 방지)
     restoreGradientText = rasterizeGradientTextForCapture(canvas);
     await Promise.all(
-      Array.from(canvas.querySelectorAll('img[data-gradient-raster="1"], img[data-vcenter-raster="1"]')).map(img => {
+      Array.from(canvas.querySelectorAll(
+        'img[data-gradient-raster="1"], img[data-vcenter-raster="1"], img[data-benefit-raster="1"]'
+      )).map(img => {
         if (img.complete && img.naturalWidth > 0) return Promise.resolve();
         return img.decode ? img.decode().catch(() => {}) : new Promise(r => {
           img.onload = () => r();
@@ -2958,7 +3202,7 @@ async function downloadImage() {
         if (storyClone) storyClone.classList.add('is-capturing');
 
         const nudgeRoots = [canvasClone, storyClone, el].filter(Boolean);
-        // 표·통계카드·아이콘행·전형칩 행·전형일정: CSS/레이아웃 보정만 (transform 금지)
+        // 일반 본문만 광학 넛지. 전형제목/칩/일정/복지는 래스터 또는 CSS에서 이미 보정됨 — transform 덮어쓰지 않음
         const nudgeSel = [
           '.pv-main-copy', '.pv-sub-copy', '.pv-corp-badge',
           '.pv-heading', '.pv-body', '.pv-sec-label', '.pv-info-val',
@@ -2976,7 +3220,7 @@ async function downloadImage() {
         const seen = new Set();
         nudgeRoots.forEach(root => {
           root.querySelectorAll(
-            '.pv-dept-table thead th, .pv-dept-cat, .pv-dept-title, .pv-dept-eng, .pv-dept-tasks, .pv-dept-team, .pv-stat-label, .pv-stat-val, .pv-benefit-item-title, .pv-benefit-title-txt, .pv-proc-title, .pv-sched-title, .pv-sched-val'
+            '.pv-dept-table thead th, .pv-dept-cat, .pv-dept-title, .pv-dept-eng, .pv-dept-tasks, .pv-dept-team, .pv-stat-label, .pv-stat-val'
           ).forEach(node => {
             node.style.transform = 'none';
           });
@@ -2993,18 +3237,24 @@ async function downloadImage() {
             node.style.paddingTop = '16px';
             node.style.paddingBottom = '24px';
           });
+          // 전형일정: 위·아래 동일 패딩 + 한글 광학 보정 유지
           root.querySelectorAll('.pv-sched-row').forEach(node => {
-            node.style.padding = '24px 0';
+            node.style.padding = '28px 0';
             node.style.alignItems = 'center';
           });
           root.querySelectorAll('.pv-sched-title, .pv-sched-val').forEach(node => {
             node.style.padding = '0';
-            node.style.transform = 'none';
+            node.style.transform = 'translateY(-0.06em)';
           });
 
           root.querySelectorAll(nudgeSel).forEach(node => {
             if (seen.has(node)) return;
-            if (node.tagName === 'IMG' || node.getAttribute('data-vcenter-raster') || node.getAttribute('data-gradient-raster')) return;
+            if (
+              node.tagName === 'IMG' ||
+              node.getAttribute('data-vcenter-raster') ||
+              node.getAttribute('data-gradient-raster') ||
+              node.getAttribute('data-benefit-raster')
+            ) return;
             seen.add(node);
             const view = clonedDoc.defaultView || window;
             const fs = parseFloat(view.getComputedStyle(node).fontSize) || 16;
@@ -3064,6 +3314,7 @@ async function downloadImage() {
   } finally {
     if (typeof restoreGradientText === 'function') restoreGradientText();
     if (typeof restoreVCenterBoxes === 'function') restoreVCenterBoxes();
+    if (typeof restoreBenefitTitles === 'function') restoreBenefitTitles();
     if (wasStoryScaled) {
       canvas.classList.remove('is-story-capture');
       canvas.classList.add('is-story');
