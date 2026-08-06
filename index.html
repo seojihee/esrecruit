@@ -294,22 +294,25 @@
     .pv-proc-track { display: flex; flex-direction: column; gap: 18px; }
     .pv-proc-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .pv-proc-title {
-      margin: 0; font-size: 26px; font-weight: 700; line-height: 1.4; color: #1e3a47;
+      margin: 0; font-size: 26px; font-weight: 700; color: #1e3a47;
+      /* 칩(28px)과 동일 높이로 수직 중앙 맞춤 */
+      height: 28px; line-height: 28px; display: flex; align-items: center;
     }
     /* Figma chip_계약형태 (265:726) */
     .pv-proc-chip {
-      display: inline-block; box-sizing: border-box;
+      display: inline-flex; align-items: center; justify-content: center;
+      box-sizing: border-box;
       height: 28px; padding: 0 8px; border-radius: 7px;
-      font-size: 16px; font-weight: 500; line-height: 28px; white-space: nowrap;
-      text-align: center; vertical-align: middle;
+      font-size: 16px; font-weight: 500; line-height: 1; white-space: nowrap;
+      text-align: center; flex-shrink: 0;
     }
-    .pv-proc-chip .chip-sub { font-size: 14px; line-height: 28px; vertical-align: middle; }
+    .pv-proc-chip .chip-sub { font-size: 14px; line-height: 1; }
     .pv-proc-chip.is-regular { background: rgba(0,177,204,.15); color: #00b1cc; }
     .pv-proc-chip.is-contract,
     .pv-proc-chip.is-contract-convert { background: rgba(98,196,0,.15); color: #5fb10d; }
     .pv-proc-chip.is-experience,
     .pv-proc-chip.is-intern { background: rgba(204,119,0,.15); color: #c80; }
-    .pv-proc-chip.is-convert { background: rgba(125,152,165,.15); color: #7d98a5; }
+    .pv-proc-chip.is-convert { background: rgba(164,93,255,.2); color: #a45dff; }
     .pv-proc-list {
       display: flex; flex-wrap: nowrap; align-items: stretch;
       justify-content: space-between; gap: 10px; width: 100%;
@@ -346,17 +349,17 @@
     .pv-sched-list { width: 100%; display: flex; flex-direction: column; }
     .pv-sched-row {
       display: flex; align-items: center; gap: 20px; min-height: 90px;
-      padding: 14px 0 22px; box-sizing: border-box;
+      padding: 24px 0; box-sizing: border-box;
       border-top: 1px solid #ced4da; border-bottom: 1px solid #ced4da; margin-top: -1px;
     }
     .pv-sched-title {
       width: 140px; flex-shrink: 0; font-size: 24px; font-weight: 700;
-      letter-spacing: -.24px; color: #1e3a47; line-height: 1.5;
-      padding-bottom: 4px;
+      letter-spacing: -.24px; color: #1e3a47; line-height: 1.4;
+      margin: 0; padding: 0;
     }
     .pv-sched-val {
-      flex: 1; font-size: 28px; font-weight: 500; color: #1e3a47; line-height: 1.5; word-break: keep-all;
-      padding-bottom: 4px;
+      flex: 1; font-size: 28px; font-weight: 500; color: #1e3a47; line-height: 1.4; word-break: keep-all;
+      margin: 0; padding: 0;
     }
 
     /* ── Section 04: 모집부문 ── */
@@ -380,37 +383,37 @@
     .pv-dept-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .pv-dept-table thead th {
       background: #f7f8fa; color: #1e3a47; font-size: 22px; font-weight: 700;
-      text-align: left; padding: 18px 16px; border: none; border-bottom: 1px solid #ced4da;
+      text-align: left; padding: 18px 16px 22px; border: none; border-bottom: 1px solid #ced4da;
       line-height: 1.4; vertical-align: middle;
     }
     .pv-dept-table tbody td {
-      padding: 16px; vertical-align: top; border-bottom: 1px solid #ced4da;
+      padding: 16px 16px 28px; vertical-align: top; border-bottom: 1px solid #ced4da;
       color: #1e3a47; word-break: keep-all; line-height: 1.6;
       text-align: left;
     }
     .pv-dept-table tbody tr:last-child td { border-bottom: 1px solid #ced4da; }
     .pv-dept-cat-cell {
       display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
-      padding-bottom: 2px;
     }
     .pv-dept-cat {
-      font-size: 24px; font-weight: 600; line-height: 1.6; margin: 0;
+      font-size: 24px; font-weight: 600; line-height: 1.4; margin: 0;
       text-align: left; width: 100%;
     }
     .pv-dept-chip {
-      display: inline-block; box-sizing: border-box;
+      display: inline-flex; align-items: center; justify-content: center;
+      box-sizing: border-box;
       height: 28px; padding: 0 8px; border-radius: 7px;
-      font-size: 16px; font-weight: 500; line-height: 28px; white-space: nowrap;
-      text-align: center; vertical-align: middle;
+      font-size: 16px; font-weight: 500; line-height: 1; white-space: nowrap;
+      text-align: center;
       align-self: flex-start; flex-shrink: 0;
     }
-    .pv-dept-chip .chip-sub { font-size: 14px; line-height: 28px; vertical-align: middle; }
+    .pv-dept-chip .chip-sub { font-size: 14px; line-height: 1; }
     .pv-dept-chip.is-regular { background: rgba(0,177,204,.15); color: #00b1cc; }
     .pv-dept-chip.is-contract,
     .pv-dept-chip.is-contract-convert { background: rgba(98,196,0,.15); color: #5fb10d; }
     .pv-dept-chip.is-experience,
     .pv-dept-chip.is-intern { background: rgba(204,119,0,.15); color: #c80; }
-    .pv-dept-chip.is-convert { background: rgba(125,152,165,.15); color: #7d98a5; }
+    .pv-dept-chip.is-convert { background: rgba(164,93,255,.2); color: #a45dff; }
     .pv-dept-job {
       display: flex; flex-direction: column; align-items: flex-start; gap: 0;
     }
@@ -559,14 +562,20 @@
     .pv-benefit-item { display: flex; flex-direction: column; gap: 12px; }
     .pv-benefit-item-title {
       display: flex; align-items: center; gap: 12px;
-      margin: 0; font-size: 22px; font-weight: 700; line-height: 1.2; color: #1e3a47;
+      margin: 0; min-height: 30px;
+      font-size: 22px; font-weight: 700; color: #1e3a47;
     }
     .pv-benefit-item-title img {
       display: block; width: 30px; height: 30px; flex-shrink: 0;
       object-fit: contain; object-position: center;
     }
     .pv-benefit-title-txt {
-      display: block; line-height: 30px; font-size: 22px; font-weight: 700; color: #1e3a47;
+      /* 아이콘(30px)과 동일 박스 높이 + 한글 광학 보정 */
+      display: block;
+      height: 30px; line-height: 30px;
+      font-size: 22px; font-weight: 700; color: #1e3a47;
+      margin: 0; padding: 0;
+      position: relative; top: -2px;
     }
     .pv-benefit-item > p:not(.pv-benefit-item-title) {
       margin: 0; font-size: 20px; font-weight: 400; line-height: 1.75; color: #1e3a47;
@@ -662,12 +671,16 @@
     }
     /* 표 헤더: 박스 높이는 유지하고 패딩으로 광학 중앙 */
     #preview-canvas.is-capturing .pv-dept-table thead th {
-      padding-top: 14px;
-      padding-bottom: 22px;
+      padding-top: 16px;
+      padding-bottom: 24px;
       transform: none !important;
     }
-    /* 표 본문: 상단 정렬 유지, 개별 transform 금지 */
-    #preview-canvas.is-capturing .pv-dept-table tbody td,
+    /* 표 본문: 상단 정렬 유지, 하단 여백 유지, 개별 transform 금지 */
+    #preview-canvas.is-capturing .pv-dept-table tbody td {
+      padding: 16px 16px 28px !important;
+      transform: none !important;
+      vertical-align: top;
+    }
     #preview-canvas.is-capturing .pv-dept-cat,
     #preview-canvas.is-capturing .pv-dept-title,
     #preview-canvas.is-capturing .pv-dept-eng,
@@ -677,7 +690,6 @@
     #preview-canvas.is-capturing .pv-dept-job,
     #preview-canvas.is-capturing .pv-dept-body {
       transform: none !important;
-      vertical-align: top;
     }
     /* 성장과 규모 카드: flex 중앙 + 하단 패딩으로 텍스트를 박스 중앙에 */
     #preview-canvas.is-capturing .pv-stat-card {
@@ -688,12 +700,18 @@
     #preview-canvas.is-capturing .pv-stat-val {
       transform: none !important;
     }
-    /* 복지 아이콘+제목: 아이콘은 고정, 텍스트만 위로 */
-    #preview-canvas.is-capturing .pv-benefit-item-title {
+    /* 전형절차 제목+칩 / 전형일정: 레이아웃으로 맞춤 — transform 금지 */
+    #preview-canvas.is-capturing .pv-proc-title,
+    #preview-canvas.is-capturing .pv-proc-head,
+    #preview-canvas.is-capturing .pv-sched-row,
+    #preview-canvas.is-capturing .pv-sched-title,
+    #preview-canvas.is-capturing .pv-sched-val {
       transform: none !important;
     }
+    /* 복지 아이콘+제목: 동일 높이 박스 — transform 금지 */
+    #preview-canvas.is-capturing .pv-benefit-item-title,
     #preview-canvas.is-capturing .pv-benefit-title-txt {
-      transform: translateY(-0.12em);
+      transform: none !important;
     }
     #preview-canvas.is-capturing :is(
       .pv-main-copy,
@@ -706,11 +724,8 @@
       .pv-apply-title,
       .pv-apply-url,
       .pv-apply-flow,
-      .pv-proc-title,
       .pv-proc-item-txt,
       .pv-note,
-      .pv-sched-title,
-      .pv-sched-val,
       .pv-hire-intro,
       .pv-hire-logo-fallback,
       .pv-s05-eco-body,
@@ -2857,6 +2872,18 @@ async function downloadImage() {
   const canvas = document.getElementById('preview-canvas');
   if (!btn || !canvas) return;
 
+  // file:// 에서는 로컬 이미지가 캔버스를 오염시켜 PNG 추출이 차단됨
+  if (location.protocol === 'file:') {
+    alert(
+      '로컬 파일(file://)로 열면 브라우저 보안 정책 때문에 이미지 추출이 되지 않습니다.\n\n' +
+      '해결 방법:\n' +
+      '1) 폴더의 「로컬서버실행.command」를 더블클릭하거나\n' +
+      '2) 터미널에서 아래 명령을 실행한 뒤 http://127.0.0.1:8765 로 열어주세요.\n\n' +
+      'python3 -m http.server 8765'
+    );
+    return;
+  }
+
   btn.disabled = true;
   btn.innerHTML = '⏳ &nbsp;이미지 캡처 중...';
 
@@ -2931,41 +2958,48 @@ async function downloadImage() {
         if (storyClone) storyClone.classList.add('is-capturing');
 
         const nudgeRoots = [canvasClone, storyClone, el].filter(Boolean);
-        // 표·통계카드·아이콘행은 CSS padding 보정만 사용 (여기선 transform 금지)
+        // 표·통계카드·아이콘행·전형칩 행·전형일정: CSS/레이아웃 보정만 (transform 금지)
         const nudgeSel = [
           '.pv-main-copy', '.pv-sub-copy', '.pv-corp-badge',
           '.pv-heading', '.pv-body', '.pv-sec-label', '.pv-info-val',
           '.pv-apply-title', '.pv-apply-url', '.pv-apply-flow',
-          '.pv-proc-title', '.pv-proc-item-txt', '.pv-note',
-          '.pv-sched-title', '.pv-sched-val',
+          '.pv-proc-item-txt', '.pv-note',
           '.pv-hire-intro', '.pv-hire-logo-fallback',
           '.pv-s05-eco-body', '.pv-s05-h', '.pv-s05-sub', '.pv-s05-note',
           '.pv-award-title', '.pv-award-desc',
           '.pv-principle-text h4', '.pv-principle-text p',
           '.pv-work-copy h4', '.pv-work-copy p',
-          '.pv-benefit-label', '.pv-benefit-title-txt',
+          '.pv-benefit-label',
           '.pv-benefit-item > p:not(.pv-benefit-item-title)',
           '.pv-empty', '.pv-ig-main', '.pv-ig-sub'
         ].join(',');
         const seen = new Set();
         nudgeRoots.forEach(root => {
-          // 표/통계 카드: 인라인 transform 잔여분 제거
           root.querySelectorAll(
-            '.pv-dept-table thead th, .pv-dept-cat, .pv-dept-title, .pv-dept-eng, .pv-dept-tasks, .pv-dept-team, .pv-stat-label, .pv-stat-val, .pv-benefit-item-title'
+            '.pv-dept-table thead th, .pv-dept-cat, .pv-dept-title, .pv-dept-eng, .pv-dept-tasks, .pv-dept-team, .pv-stat-label, .pv-stat-val, .pv-benefit-item-title, .pv-benefit-title-txt, .pv-proc-title, .pv-sched-title, .pv-sched-val'
           ).forEach(node => {
             node.style.transform = 'none';
           });
           root.querySelectorAll('.pv-dept-table tbody td').forEach(node => {
             node.style.verticalAlign = 'top';
             node.style.transform = 'none';
+            node.style.padding = '16px 16px 28px';
           });
           root.querySelectorAll('.pv-stat-card').forEach(node => {
             node.style.paddingBottom = '14px';
             node.style.boxSizing = 'border-box';
           });
           root.querySelectorAll('.pv-dept-table thead th').forEach(node => {
-            node.style.paddingTop = '14px';
-            node.style.paddingBottom = '22px';
+            node.style.paddingTop = '16px';
+            node.style.paddingBottom = '24px';
+          });
+          root.querySelectorAll('.pv-sched-row').forEach(node => {
+            node.style.padding = '24px 0';
+            node.style.alignItems = 'center';
+          });
+          root.querySelectorAll('.pv-sched-title, .pv-sched-val').forEach(node => {
+            node.style.padding = '0';
+            node.style.transform = 'none';
           });
 
           root.querySelectorAll(nudgeSel).forEach(node => {
@@ -2974,8 +3008,7 @@ async function downloadImage() {
             seen.add(node);
             const view = clonedDoc.defaultView || window;
             const fs = parseFloat(view.getComputedStyle(node).fontSize) || 16;
-            const ratio = node.classList.contains('pv-benefit-title-txt') ? 0.12 : 0.1;
-            const dy = -(fs * ratio);
+            const dy = -(fs * 0.1);
             node.style.transform = `translateY(${dy}px)`;
           });
         });
@@ -3013,7 +3046,18 @@ async function downloadImage() {
   } catch (e) {
     console.error('[downloadImage]', e);
     btn.disabled = false;
-    btn.innerHTML = '❌ &nbsp;오류 발생 - 다시 시도해주세요';
+    const msg = String(e && (e.message || e));
+    const isSecurity = /security|tainted|cross-origin|cors/i.test(msg);
+    btn.innerHTML = isSecurity
+      ? '❌ &nbsp;로컬 서버로 다시 열어주세요'
+      : '❌ &nbsp;오류 발생 - 다시 시도해주세요';
+    if (isSecurity || location.protocol === 'file:') {
+      alert(
+        '이미지 추출에 실패했습니다.\n\n' +
+        '브라우저 보안 정책으로 로컬 파일의 이미지는 PNG로 저장할 수 없습니다.\n' +
+        '「로컬서버실행.command」를 실행해 http://127.0.0.1:8765 로 열어주세요.'
+      );
+    }
     setTimeout(() => {
       btn.innerHTML = isStoryTemplate() ? '📷 &nbsp;스토리 이미지 다운로드' : '📷 &nbsp;채용 공고 이미지 다운로드';
     }, 3000);
@@ -3075,7 +3119,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById('save-label');
     if (el) el.innerHTML = `<svg style="width:14px;height:14px;color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 저장 데이터 불러옴`;
   }
+  showFileProtocolNotice();
 });
+
+/** file:// 로 연 경우 이미지 추출 불가 안내 */
+function showFileProtocolNotice() {
+  if (location.protocol !== 'file:') return;
+  if (document.getElementById('file-protocol-banner')) return;
+  const bar = document.createElement('div');
+  bar.id = 'file-protocol-banner';
+  bar.setAttribute('role', 'alert');
+  bar.style.cssText = [
+    'position:fixed', 'left:0', 'right:0', 'bottom:0', 'z-index:9999',
+    'background:#1e293b', 'color:#fff', 'padding:12px 18px',
+    'font-size:13px', 'line-height:1.5',
+    'display:flex', 'align-items:center', 'justify-content:space-between', 'gap:12px',
+    'box-shadow:0 -4px 24px rgba(0,0,0,.2)'
+  ].join(';');
+  bar.innerHTML = `
+    <span style="min-width:0;">
+      <strong style="color:#fbbf24;">이미지 추출을 쓰려면 로컬 서버로 열어주세요.</strong>
+      지금처럼 파일을 직접 열면(file://) 브라우저 보안 때문에 PNG 저장이 차단됩니다.
+      폴더의 <code style="background:rgba(255,255,255,.12);padding:1px 6px;border-radius:4px;">로컬서버실행.command</code> 를 더블클릭하세요.
+    </span>
+    <button type="button" id="file-protocol-banner-close"
+      style="flex-shrink:0;background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;">
+      닫기
+    </button>`;
+  document.body.appendChild(bar);
+  const close = document.getElementById('file-protocol-banner-close');
+  if (close) close.addEventListener('click', () => bar.remove());
+}
 </script>
 </body>
 </html>
