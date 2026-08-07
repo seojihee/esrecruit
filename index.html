@@ -1398,7 +1398,8 @@ function createDefaultState() {
     // STEP 3
     hiringGroups: [], // [{corpKey, intro, departments:[{category,chip,title,tasks,team}]}]
     // STEP 4
-    includeUnivSub: true // Figma unives-sub (원칙 / 일하는 방식)
+    includeUnivSub: true, // Figma unives-sub (원칙 / 일하는 방식)
+    exportScale: 2 // 채용공고 추출: 1=900px, 2=1800px
   };
 }
 
@@ -1470,6 +1471,7 @@ function loadSaved() {
     S.hiringGroups = normalizeHiringGroups(parsed.hiringGroups || S.hiringGroups, parsed.departments, S.corp);
     delete S.departments;
     if (typeof S.includeUnivSub !== 'boolean') S.includeUnivSub = true;
+    S.exportScale = Number(S.exportScale) === 1 ? 1 : 2;
     // 지원 기간: 구조화 필드 정규화 + 구버전 문자열 파싱
     S.periodParts = normalizePeriodParts(S.periodParts);
     let hasPeriodParts = Object.values(S.periodParts).some(v => v !== '');
@@ -2401,12 +2403,51 @@ function buildStep4() {
   </div>
 
   <div>
-    <p class="text-xs text-gray-400 mb-3 text-center">고해상도 PNG 파일로 저장됩니다.</p>
+    <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mb-3">
+      <label class="block text-xs font-bold text-gray-600 mb-2">추출 해상도</label>
+      <div class="flex flex-col gap-2.5">
+        <label class="flex items-start gap-2.5 cursor-pointer">
+          <input type="radio" name="export-scale" value="2" class="mt-0.5"
+            ${Number(S.exportScale) !== 1 ? 'checked' : ''}
+            onchange="setExportScale(2)" />
+          <span class="min-w-0">
+            <span class="block text-sm font-bold text-gray-800">고해상도 1800px (2x)</span>
+            <span class="block text-xs text-gray-400 mt-0.5">기본 · 인쇄·상세 확인용</span>
+          </span>
+        </label>
+        <label class="flex items-start gap-2.5 cursor-pointer">
+          <input type="radio" name="export-scale" value="1" class="mt-0.5"
+            ${Number(S.exportScale) === 1 ? 'checked' : ''}
+            onchange="setExportScale(1)" />
+          <span class="min-w-0">
+            <span class="block text-sm font-bold text-gray-800">표준 900px (1x)</span>
+            <span class="block text-xs text-gray-400 mt-0.5">미리보기와 동일 폭 · 용량이 작음</span>
+          </span>
+        </label>
+      </div>
+    </div>
+    <p class="text-xs text-gray-400 mb-3 text-center" id="dl-size-hint">${Number(S.exportScale) === 1 ? '900px 폭 PNG로 저장됩니다.' : '고해상도(1800px 폭) PNG로 저장됩니다.'}</p>
     <button class="dl-btn" id="dl-btn" onclick="downloadImage()">
       📷 &nbsp;채용 공고 이미지 다운로드
     </button>
   </div>
 </div>`;
+}
+
+function resolveExportScale() {
+  if (isStoryTemplate()) return 1;
+  return Number(S.exportScale) === 1 ? 1 : 2;
+}
+
+function setExportScale(n) {
+  S.exportScale = Number(n) === 1 ? 1 : 2;
+  const hint = document.getElementById('dl-size-hint');
+  if (hint) {
+    hint.textContent = S.exportScale === 1
+      ? '900px 폭 PNG로 저장됩니다.'
+      : '고해상도(1800px 폭) PNG로 저장됩니다.';
+  }
+  scheduleAutoSave();
 }
 
 function toggleUnivSub(on) {
@@ -3497,8 +3538,9 @@ async function downloadImage() {
     // 서브픽셀 잘림 방지
     h += 2;
 
-    // 해상도는 항상 유지 (채용공고 scale=2). 길면 세로 타일로 나눠 캡처 후 동일 해상도로 합성.
-    const scale = isStoryTemplate() ? 1 : 2;
+    // 채용공고: 선택 해상도(1x=900 / 2x=1800). 스토리: 1080 고정.
+    // 레이아웃·캡처 CSS는 동일하고 html2canvas scale만 변경.
+    const scale = resolveExportScale();
 
     function getMaxCanvasEdge() {
       const candidates = [16384, 8192, 4096];
