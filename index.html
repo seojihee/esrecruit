@@ -481,12 +481,35 @@
       text-align: left;
     }
     .pv-dept-table tbody tr:last-child td { border-bottom: 1px solid #ced4da; }
-    .pv-dept-cat-cell {
-      display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
+    .pv-dept-cat-cell,
+    .pv-dept-job,
+    .pv-dept-body {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .pv-dept-cat {
-      font-size: 24px; font-weight: 600; line-height: 1.4; margin: 0;
-      text-align: left; width: 100%;
+    .pv-dept-cat-cell { gap: 14px; }
+    .pv-dept-job { gap: 0; }
+    .pv-dept-body { gap: 8px; }
+    /* 세 열 첫 줄 동일 라인박스 → 상단 정렬 일치 (미리보기=추출) */
+    .pv-dept-cat,
+    .pv-dept-title,
+    .pv-dept-tasks {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      line-height: 34px;
+      min-height: 34px;
+      text-align: left;
+      width: 100%;
+    }
+    .pv-dept-cat,
+    .pv-dept-title {
+      font-size: 24px;
+      font-weight: 600;
     }
     .pv-dept-chip {
       display: inline-flex; align-items: center; justify-content: center;
@@ -503,20 +526,18 @@
     .pv-dept-chip.is-experience,
     .pv-dept-chip.is-intern { background: rgba(204,119,0,.15); color: #c80; }
     .pv-dept-chip.is-convert { background: rgba(164,93,255,.2); color: #a45dff; }
-    .pv-dept-job {
-      display: flex; flex-direction: column; align-items: flex-start; gap: 0;
-    }
-    /* 첫 줄 라인하이트를 분류열과 맞춰 상단 광학 정렬 */
-    .pv-dept-title { font-size: 24px; font-weight: 600; line-height: 1.4; margin: 0; text-align: left; }
-    .pv-dept-eng { margin: 0; font-size: 20px; font-weight: 500; color: #1e3a47; line-height: 1.4; text-align: left; }
-    .pv-dept-body {
-      display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+    .pv-dept-eng {
+      margin: 0; padding: 0; font-size: 20px; font-weight: 500; color: #1e3a47;
+      line-height: 28px; text-align: left; width: 100%;
     }
     .pv-dept-tasks {
-      margin: 0; font-size: 19px; font-weight: 500; line-height: 1.5; color: #1e3a47;
-      text-align: left; white-space: pre-wrap;
+      font-size: 19px; font-weight: 500; color: #1e3a47;
+      white-space: pre-wrap;
     }
-    .pv-dept-team { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.4; color: #7d98a5; text-align: left; }
+    .pv-dept-team {
+      margin: 0; padding: 0; font-size: 18px; font-weight: 500; color: #7d98a5;
+      line-height: 28px; text-align: left; width: 100%;
+    }
     .pv-hire-banner {
       display: block; width: 100%; height: auto;
       border: none; border-radius: 0; padding: 0; margin: 0;
@@ -793,6 +814,15 @@
       padding: 20px 16px !important;
       vertical-align: top;
       line-height: normal;
+    }
+    /* 본문 세 열 첫 줄 — 미리보기와 동일 라인박스로 추출 */
+    #preview-canvas.is-capturing .pv-dept-cat,
+    #preview-canvas.is-capturing .pv-dept-title,
+    #preview-canvas.is-capturing .pv-dept-tasks {
+      line-height: 34px !important;
+      min-height: 34px !important;
+      padding: 0 !important;
+      margin: 0 !important;
     }
     #preview-canvas.is-capturing .pv-stat-card {
       padding-bottom: 14px;
