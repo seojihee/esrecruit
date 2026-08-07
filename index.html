@@ -448,15 +448,16 @@
       background: #f7f8fa; color: #1e3a47; font-size: 22px; font-weight: 700;
       text-align: left; border: none; border-bottom: 1px solid #ced4da;
       /*
-        처짐 원인: line-height>1 반여백 + 과도한 상하 패딩이 겹치면
-        한글 글리프가 회색 바 하단으로 내려가 보인다.
-        고정 높이 + line-height:1 + 동일 패딩으로 기하 중앙만 사용.
+        고정 높이+line-height:1 은 캡처 시 상단 AA가 잘려 글리프가 찌그러져 보인다.
+        충분한 상·하 패딩으로 광학 중앙을 맞춘다 (하단을 약간 더 줌).
       */
-      height: 64px;
-      padding: 0 16px;
-      line-height: 1;
+      height: auto;
+      min-height: 64px;
+      padding: 18px 16px 22px;
+      line-height: 1.35;
       vertical-align: middle;
       box-sizing: border-box;
+      overflow: visible;
     }
     .pv-dept-table tbody td {
       /* 상·하 동일 패딩 — 하단만 키우면 텍스트가 아래로 처져 보임 */
@@ -764,10 +765,12 @@
       깨지기 쉬운 박스/행은 JS 래스터화로 픽셀 고정.
     */
     #preview-canvas.is-capturing .pv-dept-table thead th {
-      height: 64px !important;
-      padding: 0 16px !important;
-      line-height: 1 !important;
+      height: auto !important;
+      min-height: 64px !important;
+      padding: 18px 16px 22px !important;
+      line-height: 1.35 !important;
       vertical-align: middle !important;
+      overflow: visible !important;
     }
     #preview-canvas.is-capturing .pv-dept-table tbody td {
       padding: 22px 16px !important;
@@ -3180,33 +3183,45 @@ function rasterizeExportLayoutTextForCapture(root) {
     img.style.boxSizing = 'border-box';
   });
 
-  // 3) 모집부문 표 헤더 — 고정 높이 광학 중앙
+  // 3) 모집부문 표 헤더 — 상·하 여유로 AA 클리핑 방지 + 광학 중앙
   root.querySelectorAll('.pv-dept-table thead th').forEach(el => {
     const cs = getComputedStyle(el);
-    const w = Math.ceil(el.offsetWidth);
-    const h = 64;
+    const w = Math.max(1, Math.ceil(el.offsetWidth));
+    const fontSize = parseFloat(cs.fontSize) || 22;
+    // 글리프 AA가 캔버스 상단에 붙지 않도록 높이·패딩 확보
+    const padX = 16;
+    const padTop = 18;
+    const padBottom = 22;
+    const h = Math.max(64, Math.ceil(fontSize * 1.35 + padTop + padBottom));
     if (!w) return;
 
-    const scale = 2;
+    const scale = 3;
     const c = document.createElement('canvas');
-    c.width = Math.max(1, w * scale);
-    c.height = Math.max(1, h * scale);
+    c.width = Math.max(1, Math.round(w * scale));
+    c.height = Math.max(1, Math.round(h * scale));
     const ctx = c.getContext('2d');
     ctx.scale(scale, scale);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.fillStyle = cs.backgroundColor || '#f7f8fa';
     ctx.fillRect(0, 0, w, h);
 
     const text = String(el.innerText || '').replace(/\s+/g, ' ').trim();
-    const fontSize = parseFloat(cs.fontSize) || 22;
-    ctx.font = `${cs.fontWeight || '700'} ${fontSize}px ${cs.fontFamily}`;
+    const fontFamily = cs.fontFamily || "'SUIT', 'Noto Sans KR', sans-serif";
+    ctx.font = `${cs.fontWeight || '700'} ${fontSize}px ${fontFamily}`;
     ctx.fillStyle = cs.color || '#1e3a47';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     const m = ctx.measureText(text || '가');
-    const ascent = m.actualBoundingBoxAscent || fontSize * 0.8;
-    const descent = m.actualBoundingBoxDescent || fontSize * 0.2;
-    const baselineY = h / 2 + (ascent - descent) / 2;
-    ctx.fillText(text, 16, baselineY);
+    const ascent = Math.max(fontSize * 0.78, m.actualBoundingBoxAscent || fontSize * 0.8);
+    const descent = Math.max(fontSize * 0.18, m.actualBoundingBoxDescent || fontSize * 0.2);
+    // 광학 중앙 (한글은 살짝 아래로) + 상단 최소 여백으로 클리핑 방지
+    let baselineY = h / 2 + (ascent - descent) / 2 + 1;
+    const minBaseline = padTop + ascent;
+    const maxBaseline = h - padBottom - descent;
+    baselineY = Math.min(maxBaseline, Math.max(minBaseline, baselineY));
+    // 정수 좌표로 서브픽셀 번짐 완화
+    ctx.fillText(text, padX, Math.round(baselineY * scale) / scale);
 
     const img = document.createElement('img');
     img.src = c.toDataURL('image/png');
@@ -3214,20 +3229,28 @@ function rasterizeExportLayoutTextForCapture(root) {
     img.width = w;
     img.height = h;
     img.setAttribute('data-layout-raster', '1');
-    img.style.cssText = `display:block;width:100%;height:${h}px;margin:0;padding:0;border:0;`;
-    // th 내용은 비우고 이미지로 대체 (th 셀은 유지해 표 구조 보존)
+    img.style.cssText = `display:block;width:100%;height:${h}px;margin:0;padding:0;border:0;vertical-align:top;`;
     const keep = el;
     const oldHTML = keep.innerHTML;
+    const prevPad = keep.style.padding;
+    const prevH = keep.style.height;
+    const prevMinH = keep.style.minHeight;
+    const prevOverflow = keep.style.overflow;
+    const prevVA = keep.style.verticalAlign;
     keep.innerHTML = '';
     keep.style.padding = '0';
     keep.style.height = `${h}px`;
+    keep.style.minHeight = `${h}px`;
+    keep.style.overflow = 'visible';
     keep.style.verticalAlign = 'middle';
     keep.appendChild(img);
     restorers.push(() => {
       keep.innerHTML = oldHTML;
-      keep.style.padding = '';
-      keep.style.height = '';
-      keep.style.verticalAlign = '';
+      keep.style.padding = prevPad;
+      keep.style.height = prevH;
+      keep.style.minHeight = prevMinH;
+      keep.style.overflow = prevOverflow;
+      keep.style.verticalAlign = prevVA;
     });
   });
 
