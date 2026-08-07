@@ -811,8 +811,8 @@
       height: auto !important;
     }
     #preview-canvas.is-capturing .pv-dept-table tbody td {
-      /* 미리보기 상·하 20px 광학과 맞춤 — html2canvas 한글 처짐으로 하단이 줄어 보이므로 하단만 보강 */
-      padding: 20px 16px 28px !important;
+      /* 미리보기(상하 20) 광학 유지: 추출 시 한글 처짐·첫줄 라인박스로 상단이 커 보이므로 하단을 크게 보강 */
+      padding: 20px 16px 44px !important;
       vertical-align: top;
       line-height: normal;
     }
@@ -824,6 +824,13 @@
       min-height: 34px !important;
       padding: 0 !important;
       margin: 0 !important;
+    }
+    /* 마지막 요소(칩·모집팀)가 선에 붙지 않도록 — 모집부문 표 안에서만 */
+    #preview-canvas.is-capturing .pv-dept-cat-cell > img[data-vcenter-raster="1"] {
+      margin-bottom: 4px !important;
+    }
+    #preview-canvas.is-capturing .pv-dept-team {
+      padding-bottom: 4px !important;
     }
     #preview-canvas.is-capturing .pv-stat-card {
       padding-bottom: 14px;
