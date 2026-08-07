@@ -443,22 +443,34 @@
       margin: 0; font-size: 20px; font-weight: 400; line-height: 1.6; color: #162d37;
       white-space: pre-wrap; word-break: keep-all;
     }
-    .pv-dept-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    .pv-dept-table thead th {
-      background: #f7f8fa; color: #1e3a47; font-size: 22px; font-weight: 700;
-      text-align: left; border: none; border-bottom: 1px solid #ced4da;
-      /*
-        고정 높이+line-height:1 은 캡처 시 상단 AA가 잘려 글리프가 찌그러져 보인다.
-        충분한 상·하 패딩으로 광학 중앙을 맞춘다 (하단을 약간 더 줌).
-      */
-      height: auto;
-      min-height: 64px;
-      padding: 18px 16px 22px;
-      line-height: 1.35;
-      vertical-align: middle;
+    .pv-dept-wrap { width: 100%; }
+    /* 표 헤더는 th 대신 div — 세 라벨 모두 동일 폰트 렌더 (캔버스 재그리기 없음) */
+    .pv-dept-head {
+      display: grid;
+      grid-template-columns: 18% 24% minmax(0, 1fr);
+      width: 100%;
+      height: 64px;
       box-sizing: border-box;
-      overflow: visible;
+      background: #f7f8fa;
+      border-bottom: 1px solid #ced4da;
     }
+    .pv-dept-head-cell {
+      /* badge와 동일: line-height=height → html2canvas가 글자 폭을 찌그러뜨리지 않음 */
+      display: block;
+      box-sizing: border-box;
+      height: 64px;
+      line-height: 64px;
+      padding: 0 16px;
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e3a47;
+      letter-spacing: normal;
+      white-space: nowrap;
+      overflow: visible;
+      text-align: left;
+    }
+    .pv-dept-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .pv-dept-table tbody td {
       /* 상·하 동일 패딩 — 하단만 키우면 텍스트가 아래로 처져 보임 */
       padding: 22px 16px; vertical-align: top; border-bottom: 1px solid #ced4da;
@@ -760,18 +772,10 @@
     }
 
     /*
-      캡처 시 레이아웃만 고정. translateY 일괄 보정은 쓰지 않음.
-      (미리보기는 OK인데 추출만 틀어지는 주원인 = 캡처 전용 transform 덮어쓰기)
-      깨지기 쉬운 박스/행은 JS 래스터화로 픽셀 고정.
+      캡처 시 레이아웃만 고정. translateY/top 일괄 보정 금지
+      (html2canvas가 position/top을 잘못 해석해 텍스트가 더 처짐).
+      깨지기 쉬운 박스는 JS 래스터화로 픽셀 고정.
     */
-    #preview-canvas.is-capturing .pv-dept-table thead th {
-      height: auto !important;
-      min-height: 64px !important;
-      padding: 18px 16px 22px !important;
-      line-height: 1.35 !important;
-      vertical-align: middle !important;
-      overflow: visible !important;
-    }
     #preview-canvas.is-capturing .pv-dept-table tbody td {
       padding: 22px 16px !important;
       vertical-align: top;
@@ -2547,14 +2551,21 @@ function renderPreview() {
           ${corpLogoHtml(hCorp, 'pv-hire-logo')}
           <p class="pv-hire-intro">${htmlEsc(intro)}</p>
         </div>
-        <table class="pv-dept-table">
-          <thead><tr>
-            <th style="width:18%;">분류</th>
-            <th style="width:24%;">직무</th>
-            <th>주요업무 및 모집팀</th>
-          </tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
+        <div class="pv-dept-wrap">
+          <div class="pv-dept-head">
+            <div class="pv-dept-head-cell">분류</div>
+            <div class="pv-dept-head-cell">직무</div>
+            <div class="pv-dept-head-cell">주요업무 및 모집팀</div>
+          </div>
+          <table class="pv-dept-table">
+            <colgroup>
+              <col style="width:18%" />
+              <col style="width:24%" />
+              <col />
+            </colgroup>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
       </div>`;
     }).join('');
 
@@ -3052,7 +3063,8 @@ function wrapCanvasText(ctx, text, maxWidth) {
  * 미리보기는 OK인데 html2canvas만 깨는 레이아웃 텍스트를 픽셀로 고정.
  * - 전형단계(줄바꿈 포함)
  * - 전형일정 행(제목/날짜 열 정렬)
- * - 모집부문 표 헤더
+ * - 메인 회색 배너(.pv-s02)
+ * 모집부문 표 헤더는 div+line-height로 DOM 캡처 (짧은 라벨 폭 찌그러짐 방지)
  */
 function rasterizeExportLayoutTextForCapture(root) {
   const restorers = [];
@@ -3068,6 +3080,73 @@ function rasterizeExportLayoutTextForCapture(root) {
       else parent.appendChild(el);
     });
   }
+
+  // 0) 메인 회색 배너 — 미리보기 박스 좌표 기준으로 픽셀 고정 (top/transform 보정 금지)
+  root.querySelectorAll('.pv-s02').forEach(el => {
+    const headingEl = el.querySelector('.pv-heading');
+    const bodyEl = el.querySelector('.pv-body');
+    if (!headingEl || !bodyEl) return;
+    const w = Math.ceil(el.offsetWidth) || 900;
+    const h = Math.ceil(el.offsetHeight);
+    if (!w || !h) return;
+
+    const scale = 2;
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, w * scale);
+    c.height = Math.max(1, h * scale);
+    const ctx = c.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.fillStyle = '#f7f8fa';
+    ctx.fillRect(0, 0, w, h);
+
+    const elRect = el.getBoundingClientRect();
+    const padX = 60;
+
+    function paintPrewrapped(node) {
+      const cs = getComputedStyle(node);
+      const fontSize = parseFloat(cs.fontSize) || 28;
+      const lineHeightRaw = cs.lineHeight;
+      const lineHeight = (!lineHeightRaw || lineHeightRaw === 'normal')
+        ? fontSize * 1.5
+        : (parseFloat(lineHeightRaw) || fontSize * 1.5);
+      const tracking = parseFloat(cs.letterSpacing) || 0;
+      const nodeTop = node.getBoundingClientRect().top - elRect.top;
+      ctx.font = `${cs.fontWeight || '700'} ${fontSize}px ${cs.fontFamily}`;
+      ctx.fillStyle = cs.color || '#1e3a47';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      const lines = String(node.innerText || '').replace(/\r\n/g, '\n').split('\n');
+      const sample = ctx.measureText(lines.find(Boolean) || '가');
+      const ascent = sample.actualBoundingBoxAscent || fontSize * 0.8;
+      // CSS 줄박스 상단 반여백 + ascent = 첫 줄 baseline (미리보기와 동일)
+      const halfLeading = Math.max(0, (lineHeight - fontSize) / 2);
+      let baseline = nodeTop + halfLeading + ascent;
+      lines.forEach(line => {
+        if (!tracking) {
+          ctx.fillText(line, padX, baseline);
+        } else {
+          let cx = padX;
+          for (const ch of line) {
+            ctx.fillText(ch, cx, baseline);
+            cx += ctx.measureText(ch).width + tracking;
+          }
+        }
+        baseline += lineHeight;
+      });
+    }
+
+    paintPrewrapped(headingEl);
+    paintPrewrapped(bodyEl);
+
+    const img = document.createElement('img');
+    img.src = c.toDataURL('image/png');
+    img.alt = `${headingEl.innerText} ${bodyEl.innerText}`;
+    img.width = w;
+    img.height = h;
+    img.setAttribute('data-layout-raster', '1');
+    img.style.cssText = `display:block;width:${w}px;height:${h}px;margin:0;padding:0;border:0;`;
+    replaceWithImg(el, img);
+  });
 
   // 1) 전형단계 박스 — 줄바꿈 + 광학 중앙
   root.querySelectorAll('.pv-proc-item').forEach(el => {
@@ -3151,7 +3230,7 @@ function rasterizeExportLayoutTextForCapture(root) {
     const titleCs = getComputedStyle(titleEl);
     const valCs = getComputedStyle(valEl);
 
-    function drawLeftText(text, cs, x, boxW) {
+    function drawLeftText(text, cs, x) {
       const fontSize = parseFloat(cs.fontSize) || 24;
       ctx.font = `${cs.fontWeight || '700'} ${fontSize}px ${cs.fontFamily}`;
       ctx.fillStyle = cs.color || '#1e3a47';
@@ -3164,8 +3243,8 @@ function rasterizeExportLayoutTextForCapture(root) {
       ctx.fillText(text, x, baselineY);
     }
 
-    drawLeftText(title, titleCs, 0, colTitle);
-    drawLeftText(val, valCs, colTitle + gap, w - colTitle - gap);
+    drawLeftText(title, titleCs, 0);
+    drawLeftText(val, valCs, colTitle + gap);
 
     const img = document.createElement('img');
     img.src = c.toDataURL('image/png');
@@ -3174,85 +3253,15 @@ function rasterizeExportLayoutTextForCapture(root) {
     img.height = h;
     img.setAttribute('data-layout-raster', '1');
     img.style.cssText = `display:block;width:${w}px;height:${h}px;margin:0;padding:0;border:0;`;
-    // 구분선은 원본 row border를 유지하기 위해 래스터 img를 row 안에 두고 row는 비우지 않고 교체
     replaceWithImg(el, img);
-    // 구분선 복원
     img.style.borderTop = '1px solid #ced4da';
     img.style.borderBottom = '1px solid #ced4da';
     img.style.marginTop = '-1px';
     img.style.boxSizing = 'border-box';
   });
 
-  // 3) 모집부문 표 헤더 — 상·하 여유로 AA 클리핑 방지 + 광학 중앙
-  root.querySelectorAll('.pv-dept-table thead th').forEach(el => {
-    const cs = getComputedStyle(el);
-    const w = Math.max(1, Math.ceil(el.offsetWidth));
-    const fontSize = parseFloat(cs.fontSize) || 22;
-    // 글리프 AA가 캔버스 상단에 붙지 않도록 높이·패딩 확보
-    const padX = 16;
-    const padTop = 18;
-    const padBottom = 22;
-    const h = Math.max(64, Math.ceil(fontSize * 1.35 + padTop + padBottom));
-    if (!w) return;
-
-    const scale = 3;
-    const c = document.createElement('canvas');
-    c.width = Math.max(1, Math.round(w * scale));
-    c.height = Math.max(1, Math.round(h * scale));
-    const ctx = c.getContext('2d');
-    ctx.scale(scale, scale);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.fillStyle = cs.backgroundColor || '#f7f8fa';
-    ctx.fillRect(0, 0, w, h);
-
-    const text = String(el.innerText || '').replace(/\s+/g, ' ').trim();
-    const fontFamily = cs.fontFamily || "'SUIT', 'Noto Sans KR', sans-serif";
-    ctx.font = `${cs.fontWeight || '700'} ${fontSize}px ${fontFamily}`;
-    ctx.fillStyle = cs.color || '#1e3a47';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
-    const m = ctx.measureText(text || '가');
-    const ascent = Math.max(fontSize * 0.78, m.actualBoundingBoxAscent || fontSize * 0.8);
-    const descent = Math.max(fontSize * 0.18, m.actualBoundingBoxDescent || fontSize * 0.2);
-    // 광학 중앙 (한글은 살짝 아래로) + 상단 최소 여백으로 클리핑 방지
-    let baselineY = h / 2 + (ascent - descent) / 2 + 1;
-    const minBaseline = padTop + ascent;
-    const maxBaseline = h - padBottom - descent;
-    baselineY = Math.min(maxBaseline, Math.max(minBaseline, baselineY));
-    // 정수 좌표로 서브픽셀 번짐 완화
-    ctx.fillText(text, padX, Math.round(baselineY * scale) / scale);
-
-    const img = document.createElement('img');
-    img.src = c.toDataURL('image/png');
-    img.alt = text;
-    img.width = w;
-    img.height = h;
-    img.setAttribute('data-layout-raster', '1');
-    img.style.cssText = `display:block;width:100%;height:${h}px;margin:0;padding:0;border:0;vertical-align:top;`;
-    const keep = el;
-    const oldHTML = keep.innerHTML;
-    const prevPad = keep.style.padding;
-    const prevH = keep.style.height;
-    const prevMinH = keep.style.minHeight;
-    const prevOverflow = keep.style.overflow;
-    const prevVA = keep.style.verticalAlign;
-    keep.innerHTML = '';
-    keep.style.padding = '0';
-    keep.style.height = `${h}px`;
-    keep.style.minHeight = `${h}px`;
-    keep.style.overflow = 'visible';
-    keep.style.verticalAlign = 'middle';
-    keep.appendChild(img);
-    restorers.push(() => {
-      keep.innerHTML = oldHTML;
-      keep.style.padding = prevPad;
-      keep.style.height = prevH;
-      keep.style.minHeight = prevMinH;
-      keep.style.overflow = prevOverflow;
-      keep.style.verticalAlign = prevVA;
-    });
-  });
+  // 모집부문 표 헤더는 DOM(div + line-height) 그대로 캡처.
+  // 칸별/행 캔버스 재그리기는 짧은 라벨(분류·직무) 글자 폭이 찌그러지는 원인이었음.
 
   return () => { restorers.forEach(fn => { try { fn(); } catch (_) {} }); };
 }
@@ -3385,7 +3394,7 @@ async function downloadImage() {
     restoreBenefitTitles = rasterizeBenefitTitlesForCapture(canvas);
     // 배지/칩/전형제목
     restoreVCenterBoxes = rasterizeVCenterBoxesForCapture(canvas);
-    // 전형단계·전형일정·표헤더 (미리보기=추출 정렬 일치)
+    // 전형단계·전형일정·회색배너 래스터 / 표 헤더는 DOM 그대로
     restoreLayoutText = rasterizeExportLayoutTextForCapture(canvas);
     // background-clip:text
     restoreGradientText = rasterizeGradientTextForCapture(canvas);
