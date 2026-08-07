@@ -459,7 +459,8 @@
       box-sizing: border-box;
       height: auto;
       margin: 0;
-      padding: 18px 16px 20px;
+      /* 미리보기: 상·하 동일 패딩. 추출은 .is-capturing에서 별도 유지 */
+      padding: 20px 16px 20px;
       font-size: 22px;
       font-weight: 700;
       color: #1e3a47;
@@ -779,6 +780,15 @@
       (html2canvas가 position/top을 잘못 해석해 텍스트가 더 처짐).
       깨지기 쉬운 박스는 JS 래스터화로 픽셀 고정.
     */
+    /* 모집부문 헤더: 추출 시에도 하단 여백 유지 (html2canvas 한글 처짐 보정으로 하단을 더 줌) */
+    #preview-canvas.is-capturing .pv-dept-head {
+      height: auto !important;
+    }
+    #preview-canvas.is-capturing .pv-dept-head-cell {
+      padding: 14px 16px 30px !important;
+      line-height: 1.35 !important;
+      height: auto !important;
+    }
     #preview-canvas.is-capturing .pv-dept-table tbody td {
       padding: 20px 16px !important;
       vertical-align: top;
