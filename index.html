@@ -444,27 +444,26 @@
       white-space: pre-wrap; word-break: keep-all;
     }
     .pv-dept-wrap { width: 100%; }
-    /* 표 헤더는 th 대신 div — 세 라벨 모두 동일 폰트 렌더 (캔버스 재그리기 없음) */
+    /* 표 헤더: div 유지(글자 폭) + 패딩 수직 중앙 (line-height=height는 한글 처짐) */
     .pv-dept-head {
       display: grid;
       grid-template-columns: 18% 24% minmax(0, 1fr);
       width: 100%;
-      height: 64px;
+      height: auto;
       box-sizing: border-box;
       background: #f7f8fa;
       border-bottom: 1px solid #ced4da;
     }
     .pv-dept-head-cell {
-      /* badge와 동일: line-height=height → html2canvas가 글자 폭을 찌그러뜨리지 않음 */
       display: block;
       box-sizing: border-box;
-      height: 64px;
-      line-height: 64px;
-      padding: 0 16px;
+      height: auto;
       margin: 0;
+      padding: 18px 16px 20px;
       font-size: 22px;
       font-weight: 700;
       color: #1e3a47;
+      line-height: 1.35;
       letter-spacing: normal;
       white-space: nowrap;
       overflow: visible;
@@ -472,9 +471,12 @@
     }
     .pv-dept-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .pv-dept-table tbody td {
-      /* 상·하 동일 패딩 — 하단만 키우면 텍스트가 아래로 처져 보임 */
-      padding: 22px 16px; vertical-align: top; border-bottom: 1px solid #ced4da;
-      color: #1e3a47; word-break: keep-all; line-height: 1.6;
+      padding: 20px 16px;
+      vertical-align: top;
+      border-bottom: 1px solid #ced4da;
+      color: #1e3a47;
+      word-break: keep-all;
+      line-height: normal;
       text-align: left;
     }
     .pv-dept-table tbody tr:last-child td { border-bottom: 1px solid #ced4da; }
@@ -503,16 +505,17 @@
     .pv-dept-job {
       display: flex; flex-direction: column; align-items: flex-start; gap: 0;
     }
-    .pv-dept-title { font-size: 24px; font-weight: 600; line-height: 1.6; margin: 0; text-align: left; }
-    .pv-dept-eng { margin: 0; font-size: 20px; font-weight: 500; color: #1e3a47; line-height: 1.6; text-align: left; }
+    /* 첫 줄 라인하이트를 분류열과 맞춰 상단 광학 정렬 */
+    .pv-dept-title { font-size: 24px; font-weight: 600; line-height: 1.4; margin: 0; text-align: left; }
+    .pv-dept-eng { margin: 0; font-size: 20px; font-weight: 500; color: #1e3a47; line-height: 1.4; text-align: left; }
     .pv-dept-body {
       display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
     }
     .pv-dept-tasks {
-      margin: 0; font-size: 19px; font-weight: 500; line-height: 1.6; color: #1e3a47;
+      margin: 0; font-size: 19px; font-weight: 500; line-height: 1.5; color: #1e3a47;
       text-align: left; white-space: pre-wrap;
     }
-    .pv-dept-team { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.6; color: #7d98a5; text-align: left; }
+    .pv-dept-team { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.4; color: #7d98a5; text-align: left; }
     .pv-hire-banner {
       display: block; width: 100%; height: auto;
       border: none; border-radius: 0; padding: 0; margin: 0;
@@ -777,8 +780,9 @@
       깨지기 쉬운 박스는 JS 래스터화로 픽셀 고정.
     */
     #preview-canvas.is-capturing .pv-dept-table tbody td {
-      padding: 22px 16px !important;
+      padding: 20px 16px !important;
       vertical-align: top;
+      line-height: normal;
     }
     #preview-canvas.is-capturing .pv-stat-card {
       padding-bottom: 14px;
