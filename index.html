@@ -70,6 +70,13 @@
     #auth-login-hint code {
       background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;
     }
+    .auth-logout-icon {
+      width: 32px; height: 32px; padding: 0; border: 0; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; color: #94a3b8; cursor: pointer; flex-shrink: 0;
+    }
+    .auth-logout-icon:hover { background: #f1f5f9; color: #475569; }
+    .auth-logout-icon svg { width: 16px; height: 16px; display: block; }
     .step-pill {
       display: flex; align-items: center; gap: 5px;
       padding: 5px 12px; border-radius: 999px;
@@ -918,10 +925,12 @@
         </svg>
         임시저장됨 -
       </span>
-      <div id="auth-user" class="hidden flex items-center gap-2 pr-1">
+      <div id="auth-user" class="hidden flex items-center gap-1.5 mr-1 pr-2 border-r border-gray-200">
         <span id="auth-user-name" class="text-xs font-semibold text-gray-600 max-w-[140px] truncate"></span>
-        <button type="button" id="auth-logout-btn" class="px-2.5 py-1.5 text-xs font-bold text-gray-500 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors">
-          로그아웃
+        <button type="button" id="auth-logout-btn" class="auth-logout-icon" title="로그아웃" aria-label="로그아웃">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+          </svg>
         </button>
       </div>
       <button type="button" onclick="doReset()" class="px-3.5 py-1.5 text-xs font-bold text-gray-500 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors">
@@ -1612,7 +1621,8 @@ function renderStepNav() {
   const nb = document.getElementById('next-btn');
   if (nb) {
     const isLast = S.currentStep === getMaxStep();
-    nb.innerHTML = isLast ? '완료 ✓' : '다음 단계 →';
+    nb.style.display = isLast ? 'none' : '';
+    nb.innerHTML = '다음 단계 →';
   }
 }
 
