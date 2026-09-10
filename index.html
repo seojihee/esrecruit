@@ -1211,7 +1211,26 @@ function formatPeriodParts(parts) {
 
 function syncPeriodFromParts() {
   S.periodParts = normalizePeriodParts(S.periodParts);
-  S.period = formatPeriodParts(S.periodParts);
+  if (S.periodOngoing) {
+    S.period = '상시채용';
+  } else {
+    S.period = formatPeriodParts(S.periodParts);
+  }
+}
+
+function togglePeriodOngoing(on) {
+  S.periodOngoing = !!on;
+  syncPeriodFromParts();
+  renderCenterForm();
+  renderPreview();
+  scheduleAutoSave();
+}
+
+function toggleShowSchedule(on) {
+  S.showSchedule = !!on;
+  renderCenterForm();
+  renderPreview();
+  scheduleAutoSave();
 }
 
 function parsePeriodString(str) {
@@ -1461,10 +1480,12 @@ function createDefaultState() {
     // STEP 2
     period      : '',
     periodParts : createDefaultPeriodParts(),
+    periodOngoing: false, // 상시채용 (날짜 대신 텍스트)
     procTracks  : [], // [{category:'신입', chip:'regular', steps:['서류 접수',...]}]
     docDeadline : '',
     interviewDate: '',
     announceDate : '',
+    showSchedule: true, // 전형 일정 상세 미리보기 노출
     // STEP 3
     hiringGroups: [], // [{corpKey, intro, departments:[{category,chip,title,tasks,team}]}]
     // STEP 4
@@ -1541,11 +1562,15 @@ function loadSaved() {
     S.hiringGroups = normalizeHiringGroups(parsed.hiringGroups || S.hiringGroups, parsed.departments, S.corp);
     delete S.departments;
     if (typeof S.includeUnivSub !== 'boolean') S.includeUnivSub = true;
+    if (typeof S.showSchedule !== 'boolean') S.showSchedule = true;
+    if (typeof S.periodOngoing !== 'boolean') {
+      S.periodOngoing = String(S.period || '').trim() === '상시채용';
+    }
     S.exportScale = Number(S.exportScale) === 1 ? 1 : 2;
     // 지원 기간: 구조화 필드 정규화 + 구버전 문자열 파싱
     S.periodParts = normalizePeriodParts(S.periodParts);
     let hasPeriodParts = Object.values(S.periodParts).some(v => v !== '');
-    if (!hasPeriodParts && S.period) {
+    if (!hasPeriodParts && S.period && !S.periodOngoing) {
       const parsedPeriod = parsePeriodString(S.period);
       if (parsedPeriod) {
         S.periodParts = parsedPeriod;
@@ -1554,7 +1579,7 @@ function loadSaved() {
     }
     syncPeriodFromParts();
     // 드롭다운으로 복원하지 못한 구버전 자유입력 문자열은 유지
-    if (!S.period && !hasPeriodParts && parsed.period) S.period = String(parsed.period);
+    if (!S.periodOngoing && !S.period && !hasPeriodParts && parsed.period) S.period = String(parsed.period);
     ensureBannerCopy();
     return true;
   } catch(e) { return false; }
@@ -1921,9 +1946,19 @@ function buildStep2() {
   </div>
 
   <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target="#preview-period-block">
-    <label class="block text-xs font-bold text-gray-600 mb-1.5">지원 기간</label>
-    <p class="text-xs text-gray-400 mb-2">시작 연도는 직접 입력하고, 월·일·시각은 드롭다운으로 선택하세요.</p>
-    ${buildPeriodPickerHtml()}
+    <div class="flex items-start justify-between gap-3 mb-1.5">
+      <label class="block text-xs font-bold text-gray-600">지원 기간</label>
+      <label class="flex items-center gap-2 cursor-pointer select-none shrink-0">
+        <input type="checkbox" class="w-4 h-4" style="accent-color:var(--ui-brand);"
+          ${S.periodOngoing ? 'checked' : ''}
+          onchange="togglePeriodOngoing(this.checked)" />
+        <span class="text-xs font-bold text-gray-700">상시채용</span>
+      </label>
+    </div>
+    ${S.periodOngoing
+      ? `<p class="text-xs text-gray-400">미리보기에 <span class="font-semibold text-gray-600">상시채용</span>으로 표시됩니다.</p>`
+      : `<p class="text-xs text-gray-400 mb-2">시작 연도는 직접 입력하고, 월·일·시각은 드롭다운으로 선택하세요.</p>
+    ${buildPeriodPickerHtml()}`}
   </div>
 
   <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target="#preview-proc-block">
@@ -1941,8 +1976,18 @@ function buildStep2() {
   </div>
 
   <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm" data-preview-target="#preview-sched-block">
-    <label class="block text-xs font-bold text-gray-600 mb-3">전형 일정 상세</label>
-    <div class="space-y-3">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <label class="block text-xs font-bold text-gray-600">전형 일정 상세</label>
+      <label class="flex items-center gap-2 cursor-pointer select-none shrink-0">
+        <input type="checkbox" class="w-4 h-4" style="accent-color:var(--ui-brand);"
+          ${S.showSchedule !== false ? 'checked' : ''}
+          onchange="toggleShowSchedule(this.checked)" />
+        <span class="text-xs font-bold text-gray-700">미리보기 노출</span>
+      </label>
+    </div>
+    ${S.showSchedule === false
+      ? `<p class="text-xs text-gray-400">체크를 해제하면 미리보기·다운로드에서 전형일정 영역이 숨겨집니다.</p>`
+      : `<div class="space-y-3">
       <div>
         <label class="block text-xs text-gray-500 mb-1">📋 서류 마감</label>
         <input id="f-doc" type="text" value="${safe(S.docDeadline)}"
@@ -1958,7 +2003,7 @@ function buildStep2() {
         <input id="f-announce" type="text" value="${safe(S.announceDate)}"
           placeholder="예: 4월 2일(수) 예정" class="f-input" />
       </div>
-    </div>
+    </div>`}
   </div>
 </div>`;
 }
@@ -2607,9 +2652,10 @@ function renderPreview() {
   // ── 섹션 03: 모집요강 ──
   let s03parts = [];
 
+  const periodDisplay = S.periodOngoing ? '상시채용' : (S.period || '');
   s03parts.push(`<div class="pv-info-block" id="preview-period-block">
     <p class="pv-sec-label" style="color:${color};">지원기간</p>
-    <p class="pv-info-val" id="preview-period">${htmlEsc(S.period) || '지원기간을 입력해주세요'}</p>
+    <p class="pv-info-val" id="preview-period">${htmlEsc(periodDisplay) || '지원기간을 입력해주세요'}</p>
   </div>`);
 
   s03parts.push(`<div class="pv-info-block">
@@ -2652,29 +2698,31 @@ function renderPreview() {
     </div>`);
   }
 
-  const schedRows = [
-    S.docDeadline   ? { t: '서류 접수 마감', v: S.docDeadline } : null,
-    S.interviewDate ? { t: '면접 진행 일정', v: S.interviewDate } : null,
-    S.announceDate  ? { t: '최종 합격 발표', v: S.announceDate } : null
-  ].filter(Boolean);
+  if (S.showSchedule !== false) {
+    const schedRows = [
+      S.docDeadline   ? { t: '서류 접수 마감', v: S.docDeadline } : null,
+      S.interviewDate ? { t: '면접 진행 일정', v: S.interviewDate } : null,
+      S.announceDate  ? { t: '최종 합격 발표', v: S.announceDate } : null
+    ].filter(Boolean);
 
-  if (schedRows.length) {
-    const rows = schedRows.map(r =>
-      `<div class="pv-sched-row">
-        <div class="pv-sched-title">${htmlEsc(r.t)}</div>
-        <div class="pv-sched-val">${htmlEsc(r.v)}</div>
-      </div>`
-    ).join('');
-    s03parts.push(`<div class="pv-info-block" id="preview-sched-block">
-      <p class="pv-sec-label" style="color:${color};">전형일정</p>
-      <div class="pv-sched-list" id="preview-schedule">${rows}</div>
-      <p class="pv-note">※상세 일정은 각 공고를 참고해주시기 바라며, 상기 일정은 채용 상황에 따라 변동될 수 있습니다.<br/>※공고에 따라 서류 접수 마감일과 면접 진행 일정이 상이할 수 있습니다.</p>
-    </div>`);
-  } else {
-    s03parts.push(`<div class="pv-info-block" id="preview-sched-block">
-      <p class="pv-sec-label" style="color:${color};">전형일정</p>
-      <div class="pv-sched-list" id="preview-schedule"><p class="pv-empty" style="padding:8px 0;text-align:left;">전형 일정을 입력해주세요</p></div>
-    </div>`);
+    if (schedRows.length) {
+      const rows = schedRows.map(r =>
+        `<div class="pv-sched-row">
+          <div class="pv-sched-title">${htmlEsc(r.t)}</div>
+          <div class="pv-sched-val">${htmlEsc(r.v)}</div>
+        </div>`
+      ).join('');
+      s03parts.push(`<div class="pv-info-block" id="preview-sched-block">
+        <p class="pv-sec-label" style="color:${color};">전형일정</p>
+        <div class="pv-sched-list" id="preview-schedule">${rows}</div>
+        <p class="pv-note">※상세 일정은 각 공고를 참고해주시기 바라며, 상기 일정은 채용 상황에 따라 변동될 수 있습니다.<br/>※공고에 따라 서류 접수 마감일과 면접 진행 일정이 상이할 수 있습니다.</p>
+      </div>`);
+    } else {
+      s03parts.push(`<div class="pv-info-block" id="preview-sched-block">
+        <p class="pv-sec-label" style="color:${color};">전형일정</p>
+        <div class="pv-sched-list" id="preview-schedule"><p class="pv-empty" style="padding:8px 0;text-align:left;">전형 일정을 입력해주세요</p></div>
+      </div>`);
+    }
   }
 
   const s03 = `<div class="pv-s03" id="preview-s03">${s03parts.join('')}</div>`;
@@ -2943,6 +2991,9 @@ function resolvePreviewTargetFromEl(el) {
     let target = tagged.getAttribute('data-preview-target');
     if (target === '#preview-introduce' && S.includeUnivSub === false) {
       target = '#preview-section05';
+    }
+    if (target === '#preview-sched-block' && S.showSchedule === false) {
+      target = '#preview-s03';
     }
     return target;
   }
