@@ -1226,8 +1226,8 @@ function togglePeriodOngoing(on) {
   scheduleAutoSave();
 }
 
-function toggleShowSchedule(on) {
-  S.showSchedule = !!on;
+function toggleExcludeSchedule(exclude) {
+  S.showSchedule = !exclude;
   renderCenterForm();
   renderPreview();
   scheduleAutoSave();
@@ -1485,7 +1485,7 @@ function createDefaultState() {
     docDeadline : '',
     interviewDate: '',
     announceDate : '',
-    showSchedule: true, // 전형 일정 상세 미리보기 노출
+    showSchedule: true, // false면 전형일정 미포함 (체크: 포함하지 않기)
     // STEP 3
     hiringGroups: [], // [{corpKey, intro, departments:[{category,chip,title,tasks,team}]}]
     // STEP 4
@@ -1980,13 +1980,13 @@ function buildStep2() {
       <label class="block text-xs font-bold text-gray-600">전형 일정 상세</label>
       <label class="flex items-center gap-2 cursor-pointer select-none shrink-0">
         <input type="checkbox" class="w-4 h-4" style="accent-color:var(--ui-brand);"
-          ${S.showSchedule !== false ? 'checked' : ''}
-          onchange="toggleShowSchedule(this.checked)" />
-        <span class="text-xs font-bold text-gray-700">미리보기 노출</span>
+          ${S.showSchedule === false ? 'checked' : ''}
+          onchange="toggleExcludeSchedule(this.checked)" />
+        <span class="text-xs font-bold text-gray-700">포함하지 않기</span>
       </label>
     </div>
     ${S.showSchedule === false
-      ? `<p class="text-xs text-gray-400">체크를 해제하면 미리보기·다운로드에서 전형일정 영역이 숨겨집니다.</p>`
+      ? `<p class="text-xs text-gray-400">미리보기·다운로드에서 전형일정 영역이 숨겨집니다.</p>`
       : `<div class="space-y-3">
       <div>
         <label class="block text-xs text-gray-500 mb-1">📋 서류 마감</label>
